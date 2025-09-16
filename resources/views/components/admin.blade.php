@@ -65,7 +65,7 @@
                 <div class="app-brand demo">
                     <a href="index.html" class="app-brand-link">
                         <span class="app-brand-logo demo">
-                            <span class="text-primary">
+                            {{-- <span class="text-primary">
                                 <svg width="25" viewBox="0 0 25 42" version="1.1" xmlns="http://www.w3.org/2000/svg"
                                     xmlns:xlink="http://www.w3.org/1999/xlink">
                                     <defs>
@@ -112,7 +112,8 @@
                                 </svg>
                             </span>
                         </span>
-                        <span class="app-brand-text demo menu-text fw-bold ms-2">{{ env('APP_NAME') }}</span>
+                        <span class="app-brand-text demo menu-text fw-bold ms-2">{{ env('APP_NAME') }}</span> --}}
+                        <img src="{{asset('dashboard/assets/img/kiddo.png')}}" alt="logo"  style="object-fit: cover; width: 10vw; height: 100px;">
                     </a>
 
                     <a href="javascript:void(0);" class="layout-menu-toggle menu-link text-large ms-auto">

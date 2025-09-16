@@ -69,7 +69,7 @@
                         <!-- Logo -->
                         <div class="app-brand justify-content-center">
                             <a href="index.html" class="app-brand-link gap-2">
-                                <span class="app-brand-logo demo">
+                                {{-- <span class="app-brand-logo demo">
                                     <span class="text-primary">
                                         <svg width="25" viewBox="0 0 25 42" version="1.1"
                                             xmlns="http://www.w3.org/2000/svg"
@@ -120,7 +120,10 @@
                                         </svg>
                                     </span>
                                 </span>
-                                <span class="app-brand-text demo text-heading fw-bold">Sneat</span>
+                                <span class="app-brand-text demo text-heading fw-bold">Sneat</span> --}}
+
+                                <img src="{{asset('dashboard/assets/img/kiddo.png')}}" alt="logo"  style="object-fit: cover; width: 20vw; height: 100px;">
+                                {{-- <img src="{{asset('dashboard/assets/img/kiddoplay.jpg')}}" alt="logo" width="0" height="40" style="object-fit: cover"> --- IGNORE --- --}}
                             </a>
                         </div>
                         <!-- /Logo -->
