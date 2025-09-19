@@ -8,7 +8,7 @@
     <meta name="viewport"
         content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
 
-    <title>{{ env('APP_NAME') }}</title>
+    <title>@yield('title')  {{ env('APP_NAME') }}</title>
 
     <meta name="description" content="" />
 
@@ -40,6 +40,8 @@
 
     <link rel="stylesheet" href="{{ asset('dashboard/assets/vendor/fonts/flag-icons.css') }}" />
     <link rel="stylesheet" href="{{ asset('dashboard/assets/vendor/libs/apex-charts/apex-charts.css') }}" />
+
+    @yield('css')
 
     <!-- Page CSS -->
 
@@ -423,8 +425,8 @@
                                                     </div>
                                                 </div>
                                                 <div class="flex-grow-1">
-                                                    <h6 class="mb-0">Alaa</h6>
-                                                    <small class="text-body-secondary">Admin</small>
+                                                    <h6 class="mb-0">{{ auth()->user()->name }}</h6>
+                                                    <small class="text-body-secondary">{{ auth()->user()->role->name }}</small>
                                                 </div>
                                             </div>
                                         </a>
@@ -433,7 +435,7 @@
                                         <div class="dropdown-divider my-1"></div>
                                     </li>
                                     <li>
-                                        <a class="dropdown-item" href="pages-profile-user.html">
+                                        <a class="dropdown-item" href="{{ route('admin.account.profile') }}">
                                             <i class="icon-base bx bx-user icon-md me-3"></i><span>My Profile</span>
                                         </a>
                                     </li>
@@ -571,6 +573,8 @@
 
     <!-- Page JS -->
     <script src="{{ asset('dashboard/assets/js/dashboards-analytics.js') }}"></script>
+
+    @yield('js')
 </body>
 
 </html>
