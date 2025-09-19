@@ -127,15 +127,15 @@
 
                 <ul class="menu-inner py-1">
                     <!-- Dashboards -->
-                    <li class="menu-item active open">
-                        <a href="javascript:void(0);" class="menu-link">
+                    <li class="menu-item {{ request()->routeIs('admin.index') ? 'active' : ''}}">
+                        <a href="{{ route('admin.index') }}" class="menu-link">
                             <i class="menu-icon icon-base bx bx-home-smile"></i>
                             <div data-i18n="Dashboards">Dashboards</div>
                         </a>
                     </li>
 
                     {{-- menu --}}
-                    <li class="menu-item ">
+                    <li class="menu-item active open">
                         <a href="javascript:void(0);" class="menu-link menu-toggle">
                             <i class="menu-icon icon-base bx bx-home-smile"></i>
                             <div data-i18n="Dashboards">Dashboards</div>
