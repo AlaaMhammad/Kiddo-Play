@@ -4,6 +4,10 @@ return [
     // Main Items
     'dashboard' => 'لوحة التحكم',
 
+    'language' => 'اللغة',
+    'english' => 'الإنجليزية',
+    'arabic' => 'العربية',
+
     // Headers
     'main_management_header' => 'الإدارة الأساسية',
     'kids_progress_header' => 'الأطفال والتقدم',

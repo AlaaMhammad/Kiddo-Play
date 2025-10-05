@@ -16,8 +16,9 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
             'isAuth' => isAuth::class,
-            'Localization' => Localization::class,
+            // 'Localization' => Localization::class,
         ]);
+        $middleware->appendToGroup('web', Localization::class);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

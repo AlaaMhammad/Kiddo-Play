@@ -1,7 +1,9 @@
 <!doctype html>
 
-<html lang="en" class="layout-navbar-fixed layout-menu-fixed layout-compact" dir="ltr" data-skin="default"
-    data-assets-path="../../assets/" data-template="vertical-menu-template" data-bs-theme="light">
+<html class="layout-navbar-fixed layout-menu-fixed layout-compact" data-skin="default"
+    data-assets-path="{{ asset('dashboard/assets') . '/' }}" data-base-url="{{ url('/') }}"
+    data-template="vertical-menu-template" data-bs-theme="light" @if (Session::get('locale') == 'ar') dir="rtl" lang="ar"
+    @endif>
 
 <head>
     <meta charset="utf-8" />
@@ -40,6 +42,11 @@
 
     <link rel="stylesheet" href="{{ asset('dashboard/assets/vendor/fonts/flag-icons.css') }}" />
     <link rel="stylesheet" href="{{ asset('dashboard/assets/vendor/libs/apex-charts/apex-charts.css') }}" />
+    <!-- Core CSS -->
+
+    @if (Session::get('locale') == 'ar')
+        <link rel="stylesheet" href="{{ asset('dashboard/assets/vendor/css/core-rtl.css') }}" />
+    @endif
 
     @yield('css')
 
@@ -48,13 +55,14 @@
     <!-- Helpers -->
     <script src="{{ asset('dashboard/assets/vendor/js/helpers.js') }}"></script>
     <!--! Template customizer & Theme config files MUST be included after core stylesheets and helpers.js in the <head> section -->
-
-    <script>
-        // يجب أن يشير هذا المسار إلى المجلد الذي وضعت فيه ملفات "img/customizer"
-        const assetsPath = "{{ asset('dashboard/assets') }}/";
-    </script>
-    <!--? Template customizer: To hide customizer set displayCustomizer value false in config.js.  -->
-    <script src="{{ asset('dashboard/assets/vendor/js/template-customizer.js') }}"></script>
+    @if (Session::get('locale') == 'en')
+        <script>
+            // يجب أن يشير هذا المسار إلى المجلد الذي وضعت فيه ملفات "img/customizer"
+            const assetsPath = "{{ asset('dashboard/assets/') }}/";
+        </script>
+        <!--? Template customizer: To hide customizer set displayCustomizer value false in config.js.  -->
+        <script src="{{ asset('dashboard/assets/vendor/js/template-customizer.js') }}"></script>
+    @endif
 
     <!--? Config:  Mandatory theme config file contain global vars & default theme options, Set your preferred theme option in this file.  -->
 
@@ -91,13 +99,13 @@
 
                     <div class="navbar-nav-right d-flex align-items-center justify-content-end" id="navbar-collapse">
                         <!-- Search -->
-                        <div class="navbar-nav align-items-center">
+                        {{-- <div class="navbar-nav align-items-center">
                             <div class="nav-item navbar-search-wrapper mb-0">
                                 <a class="nav-item nav-link search-toggler px-0" href="javascript:void(0);">
                                     <span class="d-inline-block text-body-secondary fw-normal" id="autocomplete"></span>
                                 </a>
                             </div>
-                        </div>
+                        </div> --}}
 
                         <!-- /Search -->
 
@@ -110,10 +118,19 @@
                                 </a>
                                 <ul class="dropdown-menu dropdown-menu-end">
                                     <li>
-                                        <a class="dropdown-item" href="javascript:void(0);" data-language="en"
+                                        <a class="dropdown-item" href="{{route('en')}}" data-language="en"
                                             data-text-direction="ltr">
-                                            <span>English</span>
+                                            <span>@lang('menu.english')</span>
                                         </a>
+                                        {{-- <form action="{{ route('change.language') }}" method="POST" class="m-0">
+                                            @csrf
+                                            <input type="hidden" name="lang" value="en">
+                                            <button type="submit"
+                                                class="dropdown-item {{ Session::get('locale') == 'en' ? 'active' : '' }}">
+                                                <span class="align-middle">@lang('menu.english')</span>
+                                            </button>
+                                        </form> --}}
+
                                     </li>
                                     {{-- <li>
                                         <a class="dropdown-item" href="javascript:void(0);" data-language="fr"
@@ -122,10 +139,18 @@
                                         </a>
                                     </li> --}}
                                     <li>
-                                        <a class="dropdown-item" href="javascript:void(0);" data-language="ar"
+                                        <a class="dropdown-item" href="{{route('ar')}}" data-language="ar"
                                             data-text-direction="rtl">
-                                            <span>Arabic</span>
+                                            <span>@lang('menu.arabic')</span>
                                         </a>
+                                        {{-- <form action="{{ route('change.language') }}" method="POST" class="m-0">
+                                            @csrf
+                                            <input type="hidden" name="lang" value="ar">
+                                            <button type="submit"
+                                                class="dropdown-item {{ Session::get('locale') == 'ar' ? 'active' : '' }}">
+                                                <span class="align-middle">@lang('menu.arabic')</span>
+                                            </button>
+                                        </form> --}}
                                     </li>
                                     {{-- <li>
                                         <a class="dropdown-item" href="javascript:void(0);" data-language="de"
@@ -475,7 +500,8 @@
 
     <script src="{{ asset('dashboard/assets/vendor/libs/hammer/hammer.js') }}"></script>
 
-    <script src="{{ asset('dashboard/assets/vendor/libs/i18n/i18n.js') }}"></script>
+    {{--
+    <script src="{{ asset('dashboard/assets/vendor/libs/i18n/i18n.js') }}"></script> --}}
 
     <script src="{{ asset('dashboard/assets/vendor/js/menu.js') }}"></script>
 
@@ -491,34 +517,6 @@
     <!-- Page JS -->
     <script src="{{ asset('dashboard/assets/js/dashboards-analytics.js') }}"></script>
 
-    <script>
-        $(document).on('click', '.switch-lang', function (e) {
-            e.preventDefault(); // منع السلوك الافتراضي للرابط (إعادة التحميل)
-
-            let newLocale = $(this).data('locale');
-            let url = '/language/' + newLocale; // المسار الذي أنشأته
-
-            $.ajax({
-                url: url,
-                type: 'GET', // أو POST، حسب ما تفضله
-                data: {
-                    _token: '{{ csrf_token() }}' // إذا كنت تستخدم POST
-                },
-                success: function (response) {
-                    // **الأهم:** إعادة تحميل الصفحة بعد النجاح
-                    // هذا التحديث هو تحديث واحد ومقصود بعد تغيير اللغة
-                    window.location.reload();
-
-                    // ملاحظة: إذا كنت تريد تبديل اللغة دون تحديث،
-                    // فهذا يتطلب تبديل كل النصوص يدويًا باستخدام JS، وهي عملية معقدة جدًا.
-                    // لذا، فإن أفضل حل لـ Laravel هو التحديث مرة واحدة بعد تغيير اللغة.
-                },
-                error: function (xhr) {
-                    console.error('An error occurred during language switch.');
-                }
-            });
-        });
-    </script>
 
     @yield('js')
 </body>

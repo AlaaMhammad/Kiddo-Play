@@ -17,7 +17,9 @@ class Localization
     public function handle(Request $request, Closure $next): Response
     {
         // إذا كانت الجلسة تحتوي على قيمة للغة، طبقها
-        App::setLocale(session()->get('locale', config('app.locale')));
+        if ($request->session()->has('locale')) {
+            App::setLocale($request->session()->get('locale', config('app.locale')));
+        }
 
         return $next($request);
     }

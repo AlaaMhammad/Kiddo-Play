@@ -3,6 +3,9 @@
 return [
     // Main Items
     'dashboard' => 'Dashboard',
+    'language' => 'Language',
+    'english' => 'English',
+    'arabic' => 'Arabic',
 
     // Headers
     'main_management_header' => 'Core Management',
