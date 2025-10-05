@@ -49,6 +49,10 @@
     <script src="{{ asset('dashboard/assets/vendor/js/helpers.js') }}"></script>
     <!--! Template customizer & Theme config files MUST be included after core stylesheets and helpers.js in the <head> section -->
 
+    <script>
+        // يجب أن يشير هذا المسار إلى المجلد الذي وضعت فيه ملفات "img/customizer"
+        const assetsPath = "{{ asset('dashboard/assets') }}/";
+    </script>
     <!--? Template customizer: To hide customizer set displayCustomizer value false in config.js.  -->
     <script src="{{ asset('dashboard/assets/vendor/js/template-customizer.js') }}"></script>
 
