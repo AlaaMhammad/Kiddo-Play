@@ -68,8 +68,8 @@
                 </div>
 
                 <div class="form-check form-switch mb-3">
-                    <input type="checkbox" name="is_active" class="form-check-input @error('is_active') is-invalid
-                    @enderror" {{ $user->is_active ? 'checked' : '' }}>
+                    <input type="checkbox" name="is_active" value="1" class="form-check-input @error('is_active') is-invalid
+                    @enderror" {{ $user->is_active ? 'checked' : '' }} @if($user->is_active) checked @endif>
                     <label class="form-check-label">Active</label>
                     @error('is_active')
                         <div class="invalid-feedback">

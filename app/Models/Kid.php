@@ -55,7 +55,7 @@ class Kid extends Model
 
     public function parents()
     {
-        return $this->belongsToMany(User::class, 'parent_child', 'kid_id', 'parent_id');
+        return $this->belongsToMany(User::class, 'parent_children', 'kid_id', 'parent_id');
     }
 
     public function parentalControls()

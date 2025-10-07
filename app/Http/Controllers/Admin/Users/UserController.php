@@ -39,7 +39,7 @@ class UserController extends Controller
             'email'     => 'required|email|unique:users',
             'password'  => 'required|min:6|confirmed',
             'role_id'   => 'nullable|exists:roles,id',
-            'is_active' => 'boolean',
+            'is_active' => 'nullable|boolean',
         ]);
 
         User::create([
@@ -80,13 +80,15 @@ class UserController extends Controller
             'name'      => 'required|string|max:255',
             'email'     => 'required|email|unique:users,email,' . $user->id,
             'role_id'   => 'nullable|exists:roles,id',
-            'is_active' => 'boolean',
+            'is_active' => 'nullable|boolean',
         ]);
 
         $data = $request->only(['name', 'email', 'role_id', 'is_active']);
         if ($request->filled('password')) {
             $data['password'] = Hash::make($request->password);
         }
+        // تحويل is_active إلى boolean
+        $data['is_active'] = $request->boolean('is_active');
 
         $user->update($data);
 

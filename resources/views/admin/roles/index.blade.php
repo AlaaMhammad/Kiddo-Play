@@ -32,7 +32,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach ($roles as $role)
+                    @forelse ($roles as $role)
                         <tr>
                             <td>{{ $loop->iteration }}</td>
                             <td>{{ $role->name }}</td>
@@ -47,9 +47,13 @@
                                 </form>
                             </td>
                         </tr>
-                    @endforeach
-                </tbody>
-            </table>
+                        @empty
+                            <tr>
+                                <td colspan="8" class="text-center text-muted py-4">No kids found.</td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
         </div>
-    </div>
-</x-admin>
+    </x-admin>

@@ -76,7 +76,7 @@
                 </div>
 
                 <div class="form-check form-switch mb-3">
-                    <input type="checkbox" name="is_active" class="form-check-input @error('is_active') is-invalid @enderror
+                    <input type="checkbox" name="is_active" value="1" class="form-check-input @error('is_active') is-invalid @enderror
                     " checked>
                     <label class="form-check-label">Active</label>
                     @error('is_active')

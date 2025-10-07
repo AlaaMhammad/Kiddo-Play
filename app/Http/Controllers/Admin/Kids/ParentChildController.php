@@ -3,63 +3,81 @@
 namespace App\Http\Controllers\Admin\Kids;
 
 use App\Http\Controllers\Controller;
+use App\Models\ParentChild;
+use App\Models\User;
+use App\Models\Kid;
 use Illuminate\Http\Request;
 
 class ParentChildController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        //
+        $parentChildren = ParentChild::with(['parent', 'kid'])->latest()->paginate(10);
+        return view('admin.parent-children.index', compact('parentChildren'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
-        //
+        // جلب الآباء فقط عبر العلاقة role
+        $parents = User::whereHas('role', function($q) {
+            $q->where('name', 'parent');
+        })->pluck('name', 'id');
+
+        $kids = Kid::pluck('display_name', 'id');
+
+        // لو مافيه بيانات، نرجع تنبيه جميل بدل الخطأ
+        if ($parents->isEmpty() || $kids->isEmpty()) {
+            return redirect()->route('admin.parent-children.index')
+                ->with('warning', 'Please make sure there are both Parents and Kids before linking.');
+        }
+
+        return view('admin.parent-children.create', compact('parents', 'kids'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        //
+        $data = $request->validate([
+            'parent_id' => 'required|exists:users,id',
+            'kid_id'    => 'required|exists:kids,id',
+        ]);
+
+        ParentChild::create($data);
+
+        return redirect()->route('admin.parent-children.index')->with('success', 'Relation added successfully');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    public function show(ParentChild $parentChild)
     {
-        //
+        $parentChild->load(['parent', 'kid']);
+        return view('admin.parent-children.show', compact('parentChild'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
+    public function edit(ParentChild $parentChild)
     {
-        //
+        $parents = User::whereHas('role', function($q) {
+            $q->where('name', 'parent');
+        })->pluck('name', 'id');
+
+        $kids = Kid::pluck('display_name', 'id');
+
+        return view('admin.parent-children.edit', compact('parentChild', 'parents', 'kids'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
+    public function update(Request $request, ParentChild $parentChild)
     {
-        //
+        $data = $request->validate([
+            'parent_id' => 'required|exists:users,id',
+            'kid_id'    => 'required|exists:kids,id',
+        ]);
+
+        $parentChild->update($data);
+
+        return redirect()->route('admin.parent-children.index')->with('success', 'Relation updated successfully');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
+    public function destroy(ParentChild $parentChild)
     {
-        //
+        $parentChild->delete();
+        return redirect()->route('admin.parent-children.index')->with('success', 'Relation deleted successfully');
     }
 }

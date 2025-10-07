@@ -450,7 +450,7 @@
                                         document.write(new Date().getFullYear());
                                     </script>
                                     , made with ❤️ by
-                                    <a href="https://themeselection.com" target="_blank" class="footer-link">ِAlaa
+                                    <a href="https://github.com/AlaaMhammad" target="_blank" class="footer-link">ِAlaa
                                         Mhammad</a>
                                 </div>
                                 {{-- <div class="d-none d-lg-inline-block">

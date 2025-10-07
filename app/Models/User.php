@@ -74,6 +74,6 @@ class User extends Authenticatable
 
     public function children()
     {
-        return $this->belongsToMany(Kid::class, 'parent_child', 'parent_id', 'kid_id');
+        return $this->belongsToMany(Kid::class, 'parent_children', 'parent_id', 'kid_id');
     }
 }
