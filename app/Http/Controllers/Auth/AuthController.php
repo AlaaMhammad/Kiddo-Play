@@ -112,3 +112,49 @@ class AuthController extends Controller
         return  redirect()->route('login');
     }
 }
+
+
+//  // إنشاء OTP مؤقت صالح لمدة 10 دقائق
+//     $otp = Otp::create([
+//         'user_id' => $user->id,
+//         'code' => mt_rand(100000, 999999), // OTP 6 أرقام
+//         'expires_at' => Carbon::now()->addMinutes(10),
+//         'used' => false,
+//         'purpose' => 'email_verification',
+//     ]);
+
+//     // إرسال البريد
+//     Mail::to($user->email)->send(new \App\Mail\SendOtpMail($otp));
+
+//     // إعادة التوجيه إلى صفحة التحقق من OTP
+//     return redirect()->route('otp.verify.form', $user->id);
+
+
+// public function verifyOtp(Request $request, $userId)
+// {
+//     $request->validate(['code' => 'required|digits:6']);
+
+//     $otp = Otp::where('user_id', $userId)
+//               ->where('code', $request->code)
+//               ->where('purpose', 'email_verification')
+//               ->where('used', false)
+//               ->first();
+
+//     if (!$otp || $otp->expires_at->isPast()) {
+//         return back()->withErrors(['code' => 'Invalid or expired OTP']);
+//     }
+
+//     // علامة على أن المستخدم تم تفعيله
+//     $user = $otp->user;
+//     $user->email_verified_at = now();
+//     $user->save();
+
+//     // وضع علامة على أن OTP تم استخدامه
+//     $otp->used = true;
+//     $otp->save();
+
+//     // تسجيل دخول المستخدم تلقائيًا
+//     auth()->login($user);
+
+//     return redirect()->route('login')->with('success', 'Account verified successfully!');
+// }

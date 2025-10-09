@@ -420,7 +420,7 @@
             <ul class="menu-sub">
                 {{-- Users --}}
                 <li
-                    class="menu-item {{ request()->is('admin/users*') && !request()->routeIs('admin.users.create') ? 'active' : '' }}">
+                    class="menu-item {{ request()->is('admin/users*') || request()->routeIs('admin.users.create') ||request()->routeIs('admin.users.edit') ? 'active' : '' }}">
                     <a href="{{ route('admin.users.index') }}" class="menu-link">
                         <div>{{ __('menu.view_all_users') }}</div>
                     </a>
@@ -452,37 +452,37 @@
             </a>
             <ul class="menu-sub">
                 {{-- Kids --}}
-                <li class="menu-item {{ request()->routeIs('admin.kids.index') ? 'active' : '' }}">
+                <li class="menu-item {{ request()->routeIs('admin.kids.index') || request()->routeIs('admin.kids.create') || request()->routeIs('admin.kids.edit') ? 'active' : '' }}">
                     <a href="{{ route('admin.kids.index') }}" class="menu-link">
                         <div>{{ __('menu.kids_list') }}</div>
                     </a>
                 </li>
                 {{-- Parent-Children --}}
-                <li class="menu-item {{ request()->routeIs('admin.parent-children.index') ? 'active' : '' }}">
+                <li class="menu-item {{ request()->routeIs('admin.parent-children.index') || request()->routeIs('admin.parent-children.create') ? 'active' : '' }}">
                     <a href="{{ route('admin.parent-children.index') }}" class="menu-link">
                         <div>{{ __('menu.parent_child_links') }}</div>
                     </a>
                 </li>
                 {{-- Kid Achievements --}}
-                <li class="menu-item {{ request()->routeIs('admin.kid-achievements.index') ? 'active' : '' }}">
+                <li class="menu-item {{ request()->routeIs('admin.kid-achievements.index') || request()->routeIs('admin.kid-achievements.create') || request()->routeIs('admin.kid-achievements.edit')  ? 'active' : '' }}">
                     <a href="{{ route('admin.kid-achievements.index') }}" class="menu-link">
                         <div>{{ __('menu.kid_achievements') }}</div>
                     </a>
                 </li>
                 {{-- Kid Lesson Progresses --}}
-                <li class="menu-item {{ request()->routeIs('admin.kid-lesson-progresses.index') ? 'active' : ''}}">
+                <li class="menu-item {{ request()->routeIs('admin.kid-lesson-progresses.index') || request()->routeIs('admin.kid-lesson-progresses.create') || request()->routeIs('admin.kid-lesson-progresses.edit')  ? 'active' : ''}}">
                     <a href="{{ route('admin.kid-lesson-progresses.index') }}" class="menu-link">
                         <div>{{ __('menu.lesson_progress') }}</div>
                     </a>
                 </li>
                 {{-- Kid Sessions --}}
-                <li class="menu-item {{ request()->routeIs('admin.kid-sessions.index') ? 'active' : ''}}">
+                <li class="menu-item {{ request()->routeIs('admin.kid-sessions.index') || request()->routeIs('admin.kid-sessions.create') || request()->routeIs('admin.kid-sessions.edit') ? 'active' : ''}}">
                     <a href="{{ route('admin.kid-sessions.index') }}" class="menu-link">
                         <div>{{ __('menu.kid_sessions') }}</div>
                     </a>
                 </li>
                 {{-- OTPs --}}
-                <li class="menu-item {{ request()->routeIs('admin.otps.index') ? 'active' : ''}}">
+                <li class="menu-item {{ request()->routeIs('admin.otps.index') || request()->routeIs('admin.otps.create') || request()->routeIs('admin.otps.edit') ? 'active' : ''}}">
                     <a href="{{ route('admin.otps.index') }}" class="menu-link">
                         <div>{{ __('menu.otps') }}</div>
                     </a>
@@ -502,13 +502,13 @@
             </a>
             <ul class="menu-sub">
                 {{-- Games --}}
-                <li class="menu-item {{ request()->routeIs('admin.games.index') ? 'active' : '' }}">
+                <li class="menu-item {{ request()->is('admin/games*') ? 'active' : '' }}">
                     <a href="{{ route('admin.games.index') }}" class="menu-link">
                         <div>{{ __('menu.games_list') }}</div>
                     </a>
                 </li>
                 {{-- Game Kids --}}
-                <li class="menu-item {{ request()->routeIs('admin.game-kids.index') ? 'active' : ''}}">
+                <li class="menu-item {{ request()->is('admin/game-kids*') ? 'active' : ''}}">
                     <a href="{{ route('admin.game-kids.index') }}" class="menu-link">
                         <div>{{ __('menu.kid_game_records') }}</div>
                     </a>

@@ -4,62 +4,63 @@ namespace App\Http\Controllers\Admin\Games;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\Game;
 
 class GameController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        //
+        $games = Game::latest()->paginate(15);
+        return view('admin.games.game.index', compact('games'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
-        //
+        return view('admin.games.game.create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        //
+        $data = $request->validate([
+            'description' => 'nullable|string',
+            'category' => 'required|in:educational,fun,mixed',
+            'difficulty_level' => 'required|in:easy,medium,hard',
+            'media_url' => 'nullable|url',
+            'is_active' => 'sometimes|boolean',
+        ]);
+
+        $data['is_active'] = $request->has('is_active');
+
+        Game::create($data);
+
+        return redirect()->route('games.index')->with('success', 'Game created successfully.');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    public function edit(Game $game)
     {
-        //
+        return view('admin.games.game.edit', compact('game'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
+    public function update(Request $request, Game $game)
     {
-        //
+        $data = $request->validate([
+            'description' => 'nullable|string',
+            'category' => 'required|in:educational,fun,mixed',
+            'difficulty_level' => 'required|in:easy,medium,hard',
+            'media_url' => 'nullable|url',
+            'is_active' => 'sometimes|boolean',
+        ]);
+
+        $data['is_active'] = $request->has('is_active');
+
+        $game->update($data);
+
+        return redirect()->route('games.index')->with('success', 'Game updated successfully.');
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
+    public function destroy(Game $game)
     {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        $game->delete();
+        return redirect()->route('games.index')->with('success', 'Game deleted successfully.');
     }
 }

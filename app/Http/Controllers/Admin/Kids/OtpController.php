@@ -3,63 +3,75 @@
 namespace App\Http\Controllers\Admin\Kids;
 
 use App\Http\Controllers\Controller;
+use App\Models\Otp;
+use App\Models\User;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 
 class OtpController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        //
+        $otps = Otp::with('user')->latest()->paginate(15);
+        return view('admin.otps.index', compact('otps'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
-        //
+        $users = User::all()->toArray();
+        return view('admin.otps.create', compact('users'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
+
     public function store(Request $request)
     {
-        //
+        $data = $request->validate([
+            'user_id' => 'nullable|exists:users,id',
+            'expires_at' => 'required|date',
+            'purpose' => 'nullable|string|max:255',
+        ]);
+
+        // توليد OTP تلقائي (6 أرقام عشوائية)
+        $data['code'] = mt_rand(100000, 999999);
+
+        // قيمة الافتراضية: لم يستخدم بعد
+        $data['used'] = false;
+
+        Otp::create($data);
+
+        return redirect()->route('otps.index')->with('success', 'OTP created successfully.');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+
+    public function show(Otp $otp)
     {
-        //
+        return view('admin.otps.show', compact('otp'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
+    public function edit(Otp $otp)
     {
-        //
+        $users = User::all()->toArray();
+        return view('admin.otps.edit', compact('otp', 'users'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
+    public function update(Request $request, Otp $otp)
     {
-        //
+        $request->validate([
+            'user_id' => 'nullable|exists:users,id',
+            'code' => 'required|string|max:10',
+            'expires_at' => 'required|date',
+            'used' => 'required|boolean',
+            'purpose' => 'nullable|string|max:255',
+        ]);
+
+        $otp->update($request->all());
+
+        return redirect()->route('otps.index')->with('success', 'OTP updated successfully.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
+    public function destroy(Otp $otp)
     {
-        //
+        $otp->delete();
+        return redirect()->route('otps.index')->with('success', 'OTP deleted successfully.');
     }
 }

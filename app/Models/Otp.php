@@ -17,4 +17,9 @@ class Otp extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function isExpired(): bool
+    {
+        return $this->expires_at->isPast();
+    }
 }

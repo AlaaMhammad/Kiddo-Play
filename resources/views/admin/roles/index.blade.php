@@ -47,13 +47,13 @@
                                 </form>
                             </td>
                         </tr>
-                        @empty
-                            <tr>
-                                <td colspan="8" class="text-center text-muted py-4">No kids found.</td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
+                    @empty
+                        <tr>
+                            <td colspan="8" class="text-center text-muted py-4">No kids found.</td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
         </div>
-    </x-admin>
+    </div>
+</x-admin>

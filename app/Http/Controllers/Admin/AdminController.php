@@ -26,124 +26,62 @@ class AdminController extends Controller
 
     public function update(Request $request)
     {
-
-        $request->mergeIfMissing(['admin_id' => auth()->user()->id]);
-        $admin = User::find($request->admin_id);
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
 
         $validator = Validator::make($request->all(), [
-            'admin_id' => 'required|exists:admins,id',
-            'name' => 'sometimes|string',
-            'email' => ['sometimes', 'email', Rule::unique('admins')->ignore($admin->id)],
-            'image' => 'sometimes|mimetypes:image/*',
-            'status' => 'sometimes|in:0,1',
-            'role' => 'sometimes|in:0,1,2,3,4,5',
+            'name' => 'sometimes|string|max:255',
+            'email' => ['sometimes', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
+            'image' => 'sometimes|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
 
         if ($validator->fails()) {
-            return response()->json(
-                [
-                    'status' => 0,
-                    'message' => $validator->errors()->first()
-                ]
-            );
+            return response()->json(['status' => 0, 'message' => $validator->errors()->first()]);
         }
 
-        try {
-
-            $admin->update($request->except('image'));
-
-            if ($request->hasFile('image')) {
-                $url = $request->image->store('/uploads/admins/images', 'upload');
-                $admin->image = $url;
-                $admin->save();
-            }
-
-            return response()->json([
-                'status' => 1,
-                'message' => 'success',
-                'data' => $admin
-            ]);
-        } catch (Exception $e) {
-            return response()->json(
-                [
-                    'status' => 0,
-                    'message' => $e->getMessage()
-                ]
-            );
+        if ($request->hasFile('image')) {
+            $path = $request->file('image')->store('uploads/users', 'public');
+            $user->image = $path;
         }
+
+        $user->name = $request->name ?? $user->name;
+        $user->email = $request->email ?? $user->email;
+        $user->save();
+
+        return response()->json(['status' => 1, 'message' => 'Profile updated successfully', 'data' => $user]);
     }
 
-    public function delete(Request $request)
-    {
-
-        $request->mergeIfMissing(['admin_id' => auth()->user()->id]);
-
-        $validator = Validator::make($request->all(), [
-            'admin_id' => 'required',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json(
-                [
-                    'status' => 0,
-                    'message' => $validator->errors()->first()
-                ]
-            );
-        }
-
-        try {
-
-            $admin = User::findOrFail($request->admin_id);
-
-            $admin->delete();
-
-            return response()->json([
-                'status' => 1,
-                'message' => 'success',
-            ]);
-        } catch (Exception $e) {
-            return response()->json(
-                [
-                    'status' => 0,
-                    'message' => $e->getMessage()
-                ]
-            );
-        }
-    }
     public function change_password(Request $request)
     {
-
-        $validator = Validator::make($request->all(), [
+        $request->validate([
             'old_password' => 'required',
             'new_password' => 'required|min:8|confirmed',
         ]);
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
 
-
-
-        if ($validator->fails()) {
-            return response()->json([
-                'status' => 0,
-                'message' => $validator->errors()->first()
-            ]);
+        if (!Hash::check($request->old_password, $user->password)) {
+            return redirect()->back()->with('error', 'Wrong current password');
         }
 
-        $user = auth()->user();
+        $user->password = Hash::make($request->new_password);
+        $user->save();
 
-        if (Hash::check($request->old_password, $user->password)) {
+        return redirect()->back()->with('success', 'Password changed successfully');
+    }
 
-            $user->password = Hash::make($request->new_password);
-            $user->save();
 
-            return response()->json([
-                'status' => 1,
-                'message' => __('password changed')
-            ]);
-        } else {
+    public function delete(Request $request)
+    {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
 
-            return response()->json([
-                'status' => 0,
-                'message' => __('wrong password')
-            ]);
+        if (!$user) {
+            return response()->json(['status' => 0, 'message' => 'User not found']);
         }
+
+        $user->delete();
+
+        return response()->json(['status' => 1, 'message' => 'Account deleted successfully']);
     }
 }
