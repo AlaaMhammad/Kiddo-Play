@@ -3,63 +3,67 @@
 namespace App\Http\Controllers\Admin\Lessons;
 
 use App\Http\Controllers\Controller;
+use App\Models\Quiz;
+use App\Models\Lesson;
 use Illuminate\Http\Request;
 
 class QuizController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        //
+        $quizzes = Quiz::with('lesson')->latest()->paginate(10);
+        return view('admin.Lessons.quizzes.index', compact('quizzes'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
-        //
+        $lessons = Lesson::where('is_published', true)->get(['id', 'title']);
+        return view('admin.Lessons.quizzes.create', compact('lessons'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'lesson_id' => 'nullable|exists:lessons,id',
+            'title' => 'nullable|string|max:255',
+            'time_limit_seconds' => 'nullable|integer|min:0',
+            'is_active' => 'boolean',
+        ]);
+
+        Quiz::create($validated);
+
+        return redirect()->route('admin.quizzes.index')->with('success', 'Quiz created successfully.');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    public function show(Quiz $quiz)
     {
-        //
+        $quiz->load(['lesson', 'questions']);
+        return view('admin.Lessons.quizzes.show', compact('quiz'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
+    public function edit(Quiz $quiz)
     {
-        //
+        $lessons = Lesson::where('is_published', true)->get(['id', 'title']);
+        return view('admin.Lessons.quizzes.edit', compact('quiz', 'lessons'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
+    public function update(Request $request, Quiz $quiz)
     {
-        //
+        $validated = $request->validate([
+            'lesson_id' => 'nullable|exists:lessons,id',
+            'title' => 'nullable|string|max:255',
+            'time_limit_seconds' => 'nullable|integer|min:0',
+            'is_active' => 'boolean',
+        ]);
+
+        $quiz->update($validated);
+
+        return redirect()->route('admin.quizzes.index')->with('success', 'Quiz updated successfully.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
+    public function destroy(Quiz $quiz)
     {
-        //
+        $quiz->delete();
+        return redirect()->route('admin.quizzes.index')->with('success', 'Quiz deleted successfully.');
     }
 }

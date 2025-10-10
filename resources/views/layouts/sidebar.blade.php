@@ -544,13 +544,13 @@
             </a>
             <ul class="menu-sub">
                 {{-- Store Items --}}
-                <li class="menu-item {{ request()->routeIs('admin.store-items.index') ? 'active' : '' }}">
+                <li class="menu-item {{ request()->is('admin/store-items*') ? 'active' : '' }}">
                     <a href="{{ route('admin.store-items.index') }}" class="menu-link">
                         <div>{{ __('menu.store_items') }}</div>
                     </a>
                 </li>
                 {{-- Purchases --}}
-                <li class="menu-item {{ request()->routeIs('admin.purchases.index') ? 'active' : '' }}">
+                <li class="menu-item {{ request()->is('admin/purchases*') ? 'active' : '' }}">
                     <a href="{{ route('admin.purchases.index') }}" class="menu-link">
                         <div>{{ __('menu.purchases_records') }}</div>
                     </a>
@@ -570,31 +570,31 @@
             </a>
             <ul class="menu-sub">
                 {{-- Lessons --}}
-                <li class="menu-item {{ request()->routeIs('admin.lessons.index') ? 'active' : '' }}">
+                <li class="menu-item {{ request()->is('admin/lessons*') ? 'active' : '' }}">
                     <a href="{{ route('admin.lessons.index') }}" class="menu-link">
                         <div>{{ __('menu.lessons') }}</div>
                     </a>
                 </li>
                 {{-- Quizzes --}}
-                <li class="menu-item {{ request()->routeIs('admin.quizzes.index') ? 'active' : '' }}">
+                <li class="menu-item {{ request()->is('admin/quizzes*') ? 'active' : '' }}">
                     <a href="{{ route('admin.quizzes.index') }}" class="menu-link">
                         <div>{{ __('menu.quizzes') }}</div>
                     </a>
                 </li>
                 {{-- Questions --}}
-                <li class="menu-item {{ request()->routeIs('admin.questions.index') ? 'active' : '' }}">
+                <li class="menu-item {{ request()->is('admin/questions*') ? 'active' : '' }}">
                     <a href="{{ route('admin.questions.index') }}" class="menu-link">
                         <div>{{ __('menu.questions') }}</div>
                     </a>
                 </li>
                 {{-- Quiz Attempts --}}
-                <li class="menu-item {{ request()->routeIs('admin.quiz-attempts.index') ? 'active' : ''}}">
+                <li class="menu-item {{ request()->is('admin/quiz-attempts*') ? 'active' : ''}}">
                     <a href="{{ route('admin.quiz-attempts.index') }}" class="menu-link">
                         <div>{{ __('menu.quiz_attempts') }}</div>
                     </a>
                 </li>
                 {{-- Quiz Answers --}}
-                <li class="menu-item {{ request()->routeIs('admin.quiz-answers.index') ? 'active' : ''}}">
+                <li class="menu-item {{ request()->is('admin/quiz-answers*') ? 'active' : ''}}">
                     <a href="{{ route('admin.quiz-answers.index') }}" class="menu-link">
                         <div>{{ __('menu.quiz_answers') }}</div>
                     </a>
@@ -614,13 +614,13 @@
             </a>
             <ul class="menu-sub">
                 {{-- Points Transactions --}}
-                <li class="menu-item {{ request()->routeIs('admin.points-transactions.index') ? 'active' : ''}}">
+                <li class="menu-item {{ request()->is('admin/points-transactions*') ? 'active' : ''}}">
                     <a href="{{ route('admin.points-transactions.index') }}" class="menu-link">
                         <div>{{ __('menu.points_records') }}</div>
                     </a>
                 </li>
                 {{-- Achievements --}}
-                <li class="menu-item {{ request()->routeIs('admin.achievements.index') ? 'active' : '' }}">
+                <li class="menu-item {{ request()->is('admin/achievements*') ? 'active' : '' }}">
                     <a href="{{ route('admin.achievements.index') }}" class="menu-link">
                         <div>{{ __('menu.major_achievements') }}</div>
                     </a>
@@ -649,13 +649,13 @@
             </a>
             <ul class="menu-sub">
                 {{-- User Settings --}}
-                <li class="menu-item {{ request()->routeIs('admin.user-settings.index') ? 'active' : ''}}">
+                <li class="menu-item {{ request()->is('admin/user-settings*') ? 'active' : ''}}">
                     <a href="{{ route('admin.user-settings.index') }}" class="menu-link">
                         <div>{{ __('menu.user_settings') }}</div>
                     </a>
                 </li>
                 {{-- Parental Controls --}}
-                <li class="menu-item {{ request()->routeIs('admin.parental-controls.index') ? 'active' : ''}}">
+                <li class="menu-item {{ request()->is('admin/parental-controls*') ? 'active' : ''}}">
                     <a href="{{ route('admin.parental-controls.index') }}" class="menu-link">
                         <div>{{ __('menu.parental_controls') }}</div>
                     </a>
