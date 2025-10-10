@@ -13,7 +13,7 @@ class QuizAnswerController extends Controller
     public function index()
     {
         $answers = QuizAnswer::with(['attempt.kid', 'question.quiz'])->latest()->paginate(10);
-        return view('admin.lessons.quiz-answers.index', compact('answers'));
+        return view('admin.Lessons.quiz-answers.index', compact('answers'));
     }
 
     public function create()
@@ -21,7 +21,7 @@ class QuizAnswerController extends Controller
         $attempts = QuizAttempt::with('kid')->get();
         $questions = Question::with('quiz')->get();
 
-        return view('admin.lessons.quiz-answers.create', compact('attempts', 'questions'));
+        return view('admin.Lessons.quiz-answers.create', compact('attempts', 'questions'));
     }
 
     public function store(Request $request)
@@ -45,7 +45,7 @@ class QuizAnswerController extends Controller
     public function show(QuizAnswer $quizAnswer)
     {
         $quizAnswer->load(['attempt.kid', 'question.quiz']);
-        return view('admin.lessons.quiz-answers.show', compact('quizAnswer'));
+        return view('admin.Lessons.quiz-answers.show', compact('quizAnswer'));
     }
 
     public function edit(QuizAnswer $quizAnswer)
@@ -53,7 +53,7 @@ class QuizAnswerController extends Controller
         $attempts = QuizAttempt::with('kid')->get();
         $questions = Question::with('quiz')->get();
 
-        return view('admin.lessons.quiz-answers.edit', compact('quizAnswer', 'attempts', 'questions'));
+        return view('admin.Lessons.quiz-answers.edit', compact('quizAnswer', 'attempts', 'questions'));
     }
 
     public function update(Request $request, QuizAnswer $quizAnswer)
