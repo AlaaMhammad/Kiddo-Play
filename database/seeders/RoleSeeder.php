@@ -13,10 +13,17 @@ class RoleSeeder extends Seeder
      */
     public function run(): void
     {
+        // Admin
         Role::firstOrCreate([
             'name' => 'admin',
         ], [
             'lable' => 'Administrator',
         ]);
+
+        // Parent
+        Role::firstOrCreate(
+            ['name' => 'parent'],
+            ['lable' => 'Parent User']
+        );
     }
 }
