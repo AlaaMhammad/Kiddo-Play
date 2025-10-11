@@ -1,12 +1,13 @@
 <?php
 
 namespace App\Http\Controllers\Admin\Kids;
-
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use App\Http\Controllers\Controller;
 use App\Models\Kid;
 use App\Models\Achievement;
 use App\Models\KidAchievement;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class KidAchievementController extends Controller
 {

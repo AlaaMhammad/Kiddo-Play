@@ -3,63 +3,70 @@
 namespace App\Http\Controllers\Admin\Settings;
 
 use App\Http\Controllers\Controller;
+use App\Models\UserSetting;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class UserSettingController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        //
+        $settings = UserSetting::with('user')->latest()->paginate(10);
+        return view('admin.Settings.user-settings.index', compact('settings'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
-        //
+        $users = User::pluck('name', 'id');
+        return view('admin.Settings.user-settings.create', compact('users'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'user_id' => 'required|exists:users,id',
+            'sound_enabled' => 'boolean',
+            'music_enabled' => 'boolean',
+            'theme' => 'required|string|max:50',
+            'extra' => 'nullable|array',
+        ]);
+
+        UserSetting::create($validated);
+
+        return redirect()->route('admin.user-settings.index')
+            ->with('success', 'User setting created successfully!');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    public function show(UserSetting $userSetting)
     {
-        //
+        return view('admin.Settings.user-settings.show', compact('userSetting'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
+    public function edit(UserSetting $userSetting)
     {
-        //
+        $users = User::pluck('name', 'id');
+        return view('admin.Settings.user-settings.edit', compact('userSetting', 'users'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
+    public function update(Request $request, UserSetting $userSetting)
     {
-        //
+        $validated = $request->validate([
+            'user_id' => 'required|exists:users,id',
+            'sound_enabled' => 'boolean',
+            'music_enabled' => 'boolean',
+            'theme' => 'required|string|max:50',
+            'extra' => 'nullable|array',
+        ]);
+
+        $userSetting->update($validated);
+
+        return redirect()->route('admin.user-settings.index')
+            ->with('success', 'User setting updated successfully!');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
+    public function destroy(UserSetting $userSetting)
     {
-        //
+        $userSetting->delete();
+        return back()->with('success', 'User setting deleted successfully!');
     }
 }

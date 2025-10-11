@@ -7,6 +7,7 @@ use App\Models\Avatar;
 use App\Models\Kid;
 use App\Models\ParentChild;
 use App\Models\User;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 
 class KidController extends Controller

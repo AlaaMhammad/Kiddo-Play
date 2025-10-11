@@ -1,5 +1,8 @@
 <?php
 
+use App\Http\Middleware\CheckParent;
+use App\Http\Middleware\CheckRole;
+use App\Http\Middleware\IsAdmin;
 use App\Http\Middleware\isAuth;
 use App\Http\Middleware\Localization;
 use Illuminate\Foundation\Application;
@@ -16,7 +19,9 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
             'isAuth' => isAuth::class,
-            // 'Localization' => Localization::class,
+            // 'Admin' => IsAdmin::class,
+            'role' => CheckRole::class,
+            // 'parent' => CheckParent::class,
         ]);
         $middleware->appendToGroup('web', Localization::class);
     })
