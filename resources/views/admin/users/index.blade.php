@@ -33,7 +33,7 @@
                             <th>Email</th>
                             <th>Role</th>
                             <th>Status</th>
-                            <th>Actions</th>
+                            <th class="text-center">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -71,8 +71,18 @@
                 </table>
             </div>
 
-            <div class="mt-3">
-                {{ $users->links() }}
+            <div class="d-flex justify-content-between align-items-center mt-3">
+                <!-- Pagination links -->
+                <div>
+                    {{ $users->links() }}
+                </div>
+
+                <!-- Page info -->
+                <div class="text-muted">
+                    Page {{ $users->currentPage() }} of {{ $users->lastPage() }}
+                    - Total items: {{ $users->total() }}
+                </div>
+                Remaining items: {{ $users->total() - $users->currentPage() * $users->perPage() }}
             </div>
         </div>
     </div>

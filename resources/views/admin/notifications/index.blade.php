@@ -62,7 +62,21 @@
                     </tbody>
                 </table>
             </div>
-            <div class="mt-3">{{ $notifications->links() }}</div>
+            
+            <div class="d-flex justify-content-between align-items-center mt-3">
+                <!-- Pagination links -->
+                <div>
+                    {{ $notifications->links() }}
+                </div>
+
+                <!-- Page info -->
+                <div class="text-muted">
+                    Page {{ $notifications->currentPage() }} of {{ $notifications->lastPage() }}
+                    - Total items: {{ $notifications->total() }}
+                </div>
+                Remaining items:
+                {{ $notifications->total() - $notifications->currentPage() * $notifications->perPage() }}
+            </div>
         </div>
     </div>
 </x-admin>

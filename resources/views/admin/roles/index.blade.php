@@ -28,7 +28,7 @@
                         <th>#</th>
                         <th>Name</th>
                         <th>Label</th>
-                        <th>Actions</th>
+                        <th class="text-center">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -54,6 +54,20 @@
                     @endforelse
                 </tbody>
             </table>
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center mt-3">
+            <!-- Pagination links -->
+            <div>
+                {{ $roles->links() }}
+            </div>
+
+            <!-- Page info -->
+            <div class="text-muted">
+                Page {{ $roles->currentPage() }} of {{ $roles->lastPage() }}
+                - Total items: {{ $roles->total() }}
+            </div>
+            Remaining items: {{ $roles->total() - $roles->currentPage() * $roles->perPage() }}
         </div>
     </div>
 </x-admin>

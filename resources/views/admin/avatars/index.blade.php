@@ -37,8 +37,13 @@
                         @forelse ($avatars as $avatar)
                             <tr>
                                 <td>{{ $loop->iteration }}</td>
-                                <td><img src="{{ asset('storage/' . $avatar->image_url) }}" width="60"
-                                        height="60" class="rounded-circle"></td>
+                                {{-- <td><img src="{{ asset('storage/' . $avatar->image_url) }}" width="60"
+                                        height="60" class="rounded-circle"></td> --}}
+                                <td>
+                                    <img src="{{ asset($avatar->image_url) }}" width="60" height="60"
+                                        class="rounded-circle">
+                                </td>
+
                                 <td>{{ $avatar->name }}</td>
                                 <td>{{ $avatar->cost_points }}</td>
                                 <td>{!! $avatar->is_active
@@ -46,6 +51,8 @@
                                     : '<span class="badge bg-label-danger">Inactive</span>' !!}
                                 </td>
                                 <td>
+                                    <a href="{{ route('admin.avatars.show', $avatar->id) }}"
+                                        class="btn btn-sm btn-info"><i class="bx bx-show"></i></a>
                                     <a href="{{ route('admin.avatars.edit', $avatar) }}"
                                         class="btn btn-sm btn-warning"><i class="bx bx-edit"></i></a>
                                     <form action="{{ route('admin.avatars.destroy', $avatar) }}" method="POST"
@@ -64,7 +71,20 @@
                 </table>
             </div>
 
-            <div class="mt-3">{{ $avatars->links() }}</div>
+            <div class="d-flex justify-content-between align-items-center mt-3">
+                <!-- Pagination links -->
+                <div>
+                    {{ $avatars->links() }}
+                </div>
+
+                <!-- Page info -->
+                <div class="text-muted">
+                    Page {{ $avatars->currentPage() }} of {{ $avatars->lastPage() }}
+                    - Total items: {{ $avatars->total() }}
+                </div>
+                Remaining items: {{ $avatars->total() - ($avatars->currentPage() * $avatars->perPage()) }}
+            </div>
+
         </div>
     </div>
 </x-admin>

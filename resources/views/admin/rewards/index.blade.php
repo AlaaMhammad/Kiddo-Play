@@ -36,15 +36,18 @@
                                 <td>{{ $reward->title }}</td>
                                 <td>{{ $reward->points_required }}</td>
                                 <td>{{ $reward->is_claimed ? 'Yes' : 'No' }}</td>
-                                <td>
+                                <td class="text-center">
+                                    <a href="{{ route('admin.rewards.show', $reward->id) }}"
+                                        class="btn btn-sm btn-info"><i class="bx bx-show"></i></a>
                                     <a href="{{ route('admin.rewards.edit', $reward) }}"
-                                        class="btn btn-sm btn-warning">Edit</a>
+                                        class="btn btn-sm btn-warning"><i class="bx bx-edit"></i></a>
                                     <form action="{{ route('admin.rewards.destroy', $reward) }}" method="POST"
                                         class="d-inline-block">
                                         @csrf
                                         @method('DELETE')
                                         <button class="btn btn-sm btn-danger"
-                                            onclick="return confirm('Are you sure?')">Delete</button>
+                                            onclick="return confirm('Are you sure?')"><i
+                                                class="bx bx-trash"></i></button>
                                     </form>
                                 </td>
                             </tr>
@@ -57,10 +60,19 @@
                 </table>
             </div>
 
-            <div class="mt-3">
-                {{ $rewards->links() }}
+            <div class="d-flex justify-content-between align-items-center mt-3">
+                <!-- Pagination links -->
+                <div>
+                    {{ $rewards->links() }}
+                </div>
+
+                <!-- Page info -->
+                <div class="text-muted">
+                    Page {{ $rewards->currentPage() }} of {{ $rewards->lastPage() }}
+                    - Total items: {{ $rewards->total() }}
+                </div>
+                Remaining items: {{ $rewards->total() - $rewards->currentPage() * $rewards->perPage() }}
             </div>
         </div>
     </div>
 </x-admin>
-

@@ -2,11 +2,18 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class DailyGoal extends Model
 {
+    use HasFactory;
     protected $guarded = [];
+
+    protected $casts = [
+        'goal_date' => 'datetime',
+        'is_completed' => 'boolean',
+    ];
 
     public function kid()
     {

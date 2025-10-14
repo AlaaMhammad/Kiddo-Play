@@ -58,7 +58,19 @@
                 </tbody>
             </table>
 
-            <div class="mt-3">{{ $gameKids->links() }}</div>
+            <div class="d-flex justify-content-between align-items-center mt-3">
+                <!-- Pagination links -->
+                <div>
+                    {{ $gameKids->links() }}
+                </div>
+
+                <!-- Page info -->
+                <div class="text-muted">
+                    Page {{ $gameKids->currentPage() }} of {{ $gameKids->lastPage() }}
+                    - Total items: {{ $gameKids->total() }}
+                </div>
+                Remaining items: {{ $gameKids->total() - $gameKids->currentPage() * $gameKids->perPage() }}
+            </div>
         </div>
     </div>
 </x-admin>

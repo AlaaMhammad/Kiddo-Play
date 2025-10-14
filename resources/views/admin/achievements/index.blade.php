@@ -68,8 +68,19 @@
                 </table>
             </div>
 
-            <div class="mt-3">
-                {{ $achievements->links() }}
+
+            <div class="d-flex justify-content-between align-items-center mt-3">
+                <!-- Pagination links -->
+                <div>
+                    {{ $achievements->links() }}
+                </div>
+
+                <!-- Page info -->
+                <div class="text-muted">
+                    Page {{ $achievements->currentPage() }} of {{ $achievements->lastPage() }}
+                    - Total items: {{ $achievements->total() }}
+                </div>
+                Remaining items: {{ $achievements->total() - $achievements->currentPage() * $achievements->perPage() }}
             </div>
         </div>
     </div>

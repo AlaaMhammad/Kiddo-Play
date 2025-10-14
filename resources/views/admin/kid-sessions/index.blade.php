@@ -84,9 +84,20 @@
                 </table>
             </div>
 
-            <div class="mt-3">
-                {{ $sessions->links() }}
+            <div class="d-flex justify-content-between align-items-center mt-3">
+                <!-- Pagination links -->
+                <div>
+                    {{ $sessions->links() }}
+                </div>
+
+                <!-- Page info -->
+                <div class="text-muted">
+                    Page {{ $sessions->currentPage() }} of {{ $sessions->lastPage() }}
+                    - Total items: {{ $sessions->total() }}
+                </div>
+                Remaining items: {{ $sessions->total() - $sessions->currentPage() * $sessions->perPage() }}
             </div>
+
         </div>
     </div>
 </x-admin>

@@ -69,8 +69,18 @@
                 </table>
             </div>
 
-            <div class="mt-3">
-                {{ $kids->links() }}
+            <div class="d-flex justify-content-between align-items-center mt-3">
+                <!-- Pagination links -->
+                <div>
+                    {{ $kids->links() }}
+                </div>
+
+                <!-- Page info -->
+                <div class="text-muted">
+                    Page {{ $kids->currentPage() }} of {{ $kids->lastPage() }}
+                    - Total items: {{ $kids->total() }}
+                </div>
+                Remaining items: {{ $kids->total() - $kids->currentPage() * $kids->perPage() }}
             </div>
         </div>
     </div>

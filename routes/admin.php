@@ -119,39 +119,7 @@ Route::middleware(['isAuth'])->prefix('admin')->name('admin.')->group(function (
     });
 });
 
-// Route::middleware(['auth', 'parent'])->prefix('admin')->name('admin.')->group(function () {
-
-//     // Kids
-//     Route::resource('kids', KidController::class)->only(['index', 'show', 'edit', 'update']);
-//     Route::resource('parent-children', ParentChildController::class)->only(['index']);
-//     Route::resource('kid-achievements', KidAchievementController::class)->only(['index', 'show']);
-//     Route::resource('kid-lesson-progresses', KidLessonProgressController::class)->only(['index', 'show']);
-//     Route::resource('kid-sessions', KidSessionController::class)->only(['index', 'show']);
-//     Route::resource('otps', OtpController::class)->only(['index', 'show']);
-
-//     // Games & Goals
-//     Route::resource('games', GameController::class)->only(['index', 'show']);
-//     Route::resource('game-kids', GameKidController::class)->only(['index', 'show']);
-//     Route::resource('daily-goals', DailyGoalController::class)->only(['index', 'show']);
-
-//     // Rewards & Store
-//     Route::resource('rewards', RewardController::class)->only(['index', 'show']);
-//     Route::resource('store-items', StoreItemController::class)->only(['index', 'show']);
-//     Route::resource('purchases', PurchaseController::class)->only(['index', 'show']);
-
-//     // Education
-//     Route::resource('lessons', LessonController::class)->only(['index', 'show']);
-//     Route::resource('quizzes', QuizController::class)->only(['index', 'show']);
-//     Route::resource('questions', QuestionController::class)->only(['index', 'show']);
-//     Route::resource('quiz-attempts', QuizAttemptController::class)->only(['index', 'show']);
-//     Route::resource('quiz-answers', QuizAnswerController::class)->only(['index', 'show']);
-
-//     // Gamification
-//     Route::resource('points-transactions', PointsTransactionController::class)->only(['index']);
-//     Route::resource('achievements', AchievementController::class)->only(['index']);
-// });
-
-
+// Auth
 Route::get('/login', [AuthController::class, 'login'])->name('login');
 Route::post('/signin', [AuthController::class, 'signin'])->name('signin');
 Route::get('/register', [AuthController::class, 'register'])->name('register');

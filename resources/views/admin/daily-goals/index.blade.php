@@ -25,7 +25,7 @@
                             <th>Title</th>
                             <th>Target Points</th>
                             <th>Completed</th>
-                            <th>Goal Date</th>
+                            {{-- <th>Goal Date</th> --}}
                             <th class="text-center">Actions</th>
                         </tr>
                     </thead>
@@ -37,13 +37,17 @@
                                 <td>{{ $goal->game->description ?? '-' }}</td>
                                 <td>{{ $goal->title }}</td>
                                 <td>{{ $goal->target_points }}</td>
-                                <td>{{ $goal->is_completed ? 'Yes' : 'No' }}</td>
-                                <td>{{ $goal->goal_date->format('Y-m-d') }}</td>
+                                <td>
+                                    <span class="badge bg-{{ $goal->is_completed ? 'success' : 'danger' }}">
+                                        {{ $goal->is_completed ? 'Yes' : 'No' }}
+                                    </span>
+                                </td>
+                                {{-- <td>{{ $goal->goal_date->format('Y-m-d') }}</td> --}}
                                 <td class="text-center">
                                     <a href="{{ route('admin.daily-goals.show', $goal->id) }}"
-                                        class="btn btn-sm btn-info"><i class=""></i><i class="bx bx-show"></a>
+                                        class="btn btn-sm btn-info"><i class="bx bx-show"></i></a>
                                     <a href="{{ route('admin.daily-goals.edit', $goal->id) }}"
-                                        class="btn btn-sm btn-warning"><i class="bx bx-edit"></a>
+                                        class="btn btn-sm btn-warning"><i class="bx bx-edit"></i></a>
                                     <form action="{{ route('admin.daily-goals.destroy', $goal->id) }}" method="POST"
                                         class="d-inline">
                                         @csrf @method('DELETE')
@@ -62,8 +66,18 @@
                 </table>
             </div>
 
-            <div class="mt-3">
-                {{ $dailyGoals->links() }}
+            <div class="d-flex justify-content-between align-items-center mt-3">
+                <!-- Pagination links -->
+                <div>
+                    {{ $dailyGoals->links() }}
+                </div>
+
+                <!-- Page info -->
+                <div class="text-muted">
+                    Page {{ $dailyGoals->currentPage() }} of {{ $dailyGoals->lastPage() }}
+                    - Total items: {{ $dailyGoals->total() }}
+                </div>
+                Remaining items: {{ $dailyGoals->total() - $dailyGoals->currentPage() * $dailyGoals->perPage() }}
             </div>
         </div>
     </div>

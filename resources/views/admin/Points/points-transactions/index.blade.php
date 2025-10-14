@@ -64,7 +64,20 @@
                     </tbody>
                 </table>
             </div>
-            <div class="mt-3">{{ $transactions->links() }}</div>
+            
+            <div class="d-flex justify-content-between align-items-center mt-3">
+                <!-- Pagination links -->
+                <div>
+                    {{ $transactions->links() }}
+                </div>
+
+                <!-- Page info -->
+                <div class="text-muted">
+                    Page {{ $transactions->currentPage() }} of {{ $transactions->lastPage() }}
+                    - Total items: {{ $transactions->total() }}
+                </div>
+                Remaining items: {{ $transactions->total() - $transactions->currentPage() * $transactions->perPage() }}
+            </div>
         </div>
     </div>
 </x-admin>

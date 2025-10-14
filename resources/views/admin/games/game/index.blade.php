@@ -34,10 +34,10 @@
                             <td>{{ ucfirst($game->difficulty_level) }}</td>
                             <td>{{ $game->is_active ? 'Yes' : 'No' }}</td>
                             <td>
-                                <a href="{{ route('admin.games.show', $goal->id) }}" class="btn btn-sm btn-info"><i
-                                        class=""></i><i class="bx bx-show"></a>
+                                <a href="{{ route('admin.games.show', $game->id) }}" class="btn btn-sm btn-info"><i
+                                        class="bx bx-show"></i></a>
                                 <a href="{{ route('admin.games.edit', $game->id) }}" class="btn btn-sm btn-warning"><i
-                                        class="bx bx-edit"></a>
+                                        class="bx bx-edit"></i></a>
                                 <form action="{{ route('admin.games.destroy', $game->id) }}" method="POST"
                                     class="d-inline">
                                     @csrf @method('DELETE')
@@ -55,7 +55,19 @@
                 </tbody>
             </table>
 
-            <div class="mt-3">{{ $games->links() }}</div>
+            <div class="d-flex justify-content-between align-items-center mt-3">
+                <!-- Pagination links -->
+                <div>
+                    {{ $games->links() }}
+                </div>
+
+                <!-- Page info -->
+                <div class="text-muted">
+                    Page {{ $games->currentPage() }} of {{ $games->lastPage() }}
+                    - Total items: {{ $games->total() }}
+                </div>
+                Remaining items: {{ $games->total() - $games->currentPage() * $games->perPage() }}
+            </div>
         </div>
     </div>
 </x-admin>
