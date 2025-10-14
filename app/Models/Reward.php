@@ -10,6 +10,11 @@ class Reward extends Model
     use HasFactory;
     protected $guarded = [];
 
+    protected $casts = [
+        'claimed_at' => 'datetime',
+    ];
+
+
     public function dailyGoal()
     {
         return $this->belongsTo(DailyGoal::class);
