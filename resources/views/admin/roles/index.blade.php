@@ -37,7 +37,7 @@
                             <td>{{ $loop->iteration }}</td>
                             <td>{{ $role->name }}</td>
                             <td>{{ $role->lable }}</td>
-                            <td>
+                            <td class="text-center">
                                 <a href="{{ route('admin.roles.edit', $role) }}" class="btn btn-sm btn-warning"><i
                                         class="bx bx-edit"></i></a>
                                 <form action="{{ route('admin.roles.destroy', $role) }}" method="POST"
