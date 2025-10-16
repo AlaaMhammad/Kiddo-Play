@@ -7,9 +7,18 @@
         </a>
     </div>
 
-    @if ('success' == session('status'))
-        <div class="alert alert-success alert-dismissible" role="alert">
-            {{ session('status') }}
+    @if (session('success'))
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle me-2"></i>
+            {{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+
+    @if (session('error'))
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="bi bi-x-circle me-2"></i>
+            {{ session('error') }}
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     @endif
@@ -34,7 +43,7 @@
                 <tbody>
                     @forelse ($roles as $role)
                         <tr>
-                            <td>{{ $loop->iteration }}</td>
+                            <td>{{ $roles->firstItem() + $loop->index }}</td>
                             <td>{{ $role->name }}</td>
                             <td>{{ $role->lable }}</td>
                             <td class="text-center">

@@ -6,6 +6,23 @@
         </a>
     </div>
 
+    @if (session('success'))
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle me-2"></i>
+            {{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+
+    @if (session('error'))
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="bi bi-x-circle me-2"></i>
+            {{ session('error') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+
+
     <div class="card">
         <div class="card-header d-flex justify-content-between align-items-center">
             <h5 class="mb-0">All User Settings</h5>
@@ -31,7 +48,7 @@
                     <tbody>
                         @forelse($settings as $setting)
                             <tr>
-                                <td>{{ $loop->iteration }}</td>
+                                <td>{{ $settings->firstItem() + $loop->index }}</td>
                                 <td>{{ $setting->user->name ?? '-' }}</td>
                                 <td>
                                     <span class="badge bg-{{ $setting->sound_enabled ? 'success' : 'secondary' }}">
@@ -72,4 +89,5 @@
                 {{ $settings->links() }}
             </div>
         </div>
+    </div>
 </x-admin>

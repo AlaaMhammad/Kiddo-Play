@@ -47,7 +47,7 @@
                     <tbody>
                         @forelse($lessons as $lesson)
                             <tr>
-                                <td>{{ $loop->iteration }}</td>
+                                <td>{{ $lessons->firstItem() + $loop->index }}</td>
                                 <td>{{ ucfirst($lesson->category) }}</td>
                                 <td>{{ $lesson->title }}</td>
                                 <td>{{ $lesson->order }}</td>

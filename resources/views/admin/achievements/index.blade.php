@@ -31,7 +31,7 @@
                     <tbody>
                         @forelse ($achievements as $a)
                             <tr>
-                                <td>{{ $loop->iteration }}</td>
+                                <td>{{ $achievements->firstItem() + $loop->index }}</td>
                                 <td>{{ $a->code }}</td>
                                 <td>{{ $a->title }}</td>
                                 <td>{{ $a->points_award }}</td>

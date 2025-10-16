@@ -47,7 +47,7 @@
                     <tbody>
                         @forelse($answers as $answer)
                             <tr>
-                                <td>{{ $loop->iteration }}</td>
+                                <td>{{ $answers->firstItem() + $loop->index }}</td>
                                 <td>{{ $answer->attempt->kid->display_name ?? '-' }}</td>
                                 <td>{{ Str::limit($answer->question->content, 50) }}</td>
                                 <td>

@@ -32,7 +32,7 @@
                     <tbody>
                         @forelse ($progresses as $progress)
                             <tr>
-                                <td>{{ $loop->iteration }}</td>
+                                <td>{{ $progresses->firstItem() + $loop->index }}</td>
                                 <td>{{ $progress->kid->display_name }}</td>
                                 <td>{{ $progress->lesson->title ?? '-' }}</td>
                                 <td>{{ ucfirst(str_replace('_', ' ', $progress->status)) }}</td>

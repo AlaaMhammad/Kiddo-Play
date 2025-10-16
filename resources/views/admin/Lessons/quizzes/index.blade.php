@@ -47,7 +47,7 @@
                     <tbody>
                         @forelse($quizzes as $quiz)
                             <tr>
-                                <td>{{ $loop->iteration }}</td>
+                                <td>{{ $quizzes->firstItem() + $loop->index }}</td>
                                 <td>{{ $quiz->title ?? '-' }}</td>
                                 <td>{{ $quiz->lesson->title ?? '-' }}</td>
                                 <td>{{ $quiz->time_limit_seconds ?? '—' }}</td>

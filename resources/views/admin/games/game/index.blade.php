@@ -46,7 +46,7 @@
                 <tbody>
                     @forelse($games as $game)
                         <tr>
-                            <td>{{ $loop->iteration }}</td>
+                            <td>{{ $games->firstItem() + $loop->index }}</td>
                             <td>{{ $game->description }}</td>
                             <td>{{ ucfirst($game->category) }}</td>
                             <td>{{ ucfirst($game->difficulty_level) }}</td>

@@ -48,7 +48,7 @@
                     <tbody>
                         @forelse ($attempts as $attempt)
                             <tr>
-                                <td>{{ $loop->iteration }}</td>
+                                <td>{{ $attempts->firstItem() + $loop->index }}</td>
                                 <td>{{ $attempt->kid->display_name ?? '-' }}</td>
                                 <td>{{ $attempt->quiz->title ?? '-' }}</td>
                                 <td>{{ $attempt->score ?? '-' }}</td>

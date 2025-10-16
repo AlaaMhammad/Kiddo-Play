@@ -47,7 +47,7 @@
                     <tbody>
                         @forelse ($avatars as $avatar)
                             <tr>
-                                <td>{{ $loop->iteration }}</td>
+                                <td>{{ $avatars->firstItem() + $loop->index }}</td>
                                 <td><img src="{{ asset('storage/' . $avatar->image_url) }}" width="60"
                                         height="60" class="rounded-circle object-fit-cover"></td>
                                 <td>{{ $avatar->name }}</td>

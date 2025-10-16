@@ -46,7 +46,7 @@
                     <tbody>
                         @forelse($purchases as $purchase)
                             <tr>
-                                <td>{{ $loop->iteration }}</td>
+                                <td>{{ $purchases->firstItem() + $loop->index }}</td>
                                 <td>{{ $purchase->kid->display_name ?? '-' }}</td>
                                 <td>{{ $purchase->storeItem->title ?? '-' }}</td>
                                 <td>{{ $purchase->points_used }}</td>

@@ -40,7 +40,7 @@
                     <tbody>
                         @forelse($kids as $kid)
                             <tr>
-                                <td>{{ $loop->iteration }}</td>
+                                <td>{{ $kids->firstItem() + $loop->index }}</td>
                                 <td>{{ $kid->display_name }}</td>
                                 <td>{{ $kid->user->name ?? '-' }}</td>
                                 <td>{{ ucfirst($kid->gender ?? '-') }}</td>

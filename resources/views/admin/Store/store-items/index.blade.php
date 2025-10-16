@@ -47,7 +47,7 @@
                     <tbody>
                         @forelse($items as $item)
                             <tr>
-                                <td>{{ $loop->iteration }}</td>
+                                <td>{{ $items->firstItem() + $loop->index }}</td>
                                 <td>{{ $item->title }}</td>
                                 <td>{{ $item->type ?? '-' }}</td>
                                 <td>{{ $item->cost_points }}</td>

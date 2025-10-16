@@ -45,7 +45,7 @@
                     <tbody>
                         @forelse($notifications as $notification)
                             <tr>
-                                <td>{{ $loop->iteration }}</td>
+                                <td>{{ $notifications->firstItem() + $loop->index }}</td>
                                 <td>{{ $notification->user->name ?? '-' }}</td>
                                 <td>{{ $notification->title ?? '-' }}</td>
                                 <td>

@@ -47,7 +47,7 @@
                     <tbody>
                         @forelse($questions as $question)
                             <tr>
-                                <td>{{ $loop->iteration }}</td>
+                                <td>{{ $questions->firstItem() + $loop->index }}</td>
                                 <td>{{ $question->quiz->title ?? '-' }}</td>
                                 <td>{{ ucfirst(str_replace('_', ' ', $question->type)) }}</td>
                                 <td>{{ $question->points }}</td>

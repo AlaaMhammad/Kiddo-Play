@@ -47,7 +47,7 @@
                     <tbody>
                         @forelse ($transactions as $transaction)
                             <tr>
-                                <td>{{ $loop->iteration }}</td>
+                                <td>{{ $transactions->firstItem() + $loop->index }}</td>
                                 <td>{{ $transaction->kid->display_name ?? '-' }}</td>
                                 <td>
                                     <span

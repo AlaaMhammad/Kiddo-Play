@@ -35,7 +35,7 @@
                     <tbody>
                         @forelse($kidAchievements as $ka)
                             <tr>
-                                <td>{{ $loop->iteration }}</td>
+                                <td>{{ $kidAchievements->firstItem() + $loop->index }}</td>
                                 <td>{{ $ka->kid->display_name ?? '-' }}</td>
                                 <td>{{ $ka->achievement->title ?? '-' }}</td>
                                 <td>{{ $ka->achievement->points_award ?? 0 }}</td>

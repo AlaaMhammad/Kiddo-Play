@@ -32,7 +32,7 @@
                     <tbody>
                         @forelse ($sessions as $session)
                             <tr>
-                                <td>{{ $loop->iteration }}</td>
+                                <td>{{ $sessions->firstItem() + $loop->index }}</td>
                                 <td>{{ $session->kid->display_name ?? '—' }}</td>
                                 <td>{{ $session->started_at ? $session->started_at->format('Y-m-d H:i') : '-' }}</td>
                                 <td>{{ $session->ended_at ? $session->ended_at->format('Y-m-d H:i') : '-' }}</td>

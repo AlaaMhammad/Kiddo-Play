@@ -43,7 +43,7 @@
                     <tbody>
                         @foreach ($parentChildren as $relation)
                             <tr>
-                                <td>{{ $loop->iteration }}</td>
+                                <td>{{ $parentChildren->firstItem() + $loop->index }}</td>
                                 <td>{{ $relation->parent->name }}</td>
                                 <td>{{ $relation->kid->display_name }}</td>
                                 <td>

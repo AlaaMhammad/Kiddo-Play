@@ -46,7 +46,7 @@
                     <tbody>
                         @forelse($rewards as $reward)
                             <tr>
-                                <td>{{ $reward->id }}</td>
+                                <td>{{ $rewards->firstItem() + $loop->index }}</td>
                                 <td>{{ $reward->dailyGoal->title ?? '-' }}</td>
                                 <td>{{ $reward->title }}</td>
                                 <td>{{ $reward->points_required }}</td>

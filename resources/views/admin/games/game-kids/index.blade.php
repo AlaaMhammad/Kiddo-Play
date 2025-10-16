@@ -29,7 +29,7 @@
                 <tbody>
                     @forelse($gameKids as $gk)
                         <tr>
-                            <td>{{ $loop->iteration }}</td>
+                            <td>{{ $gameKids->firstItem() + $loop->index }}</td>
                             <td>{{ $gk->kid_name }}</td>
                             <td>{{ $gk->game_desc }}</td>
                             <td>{{ $gk->score }}</td>

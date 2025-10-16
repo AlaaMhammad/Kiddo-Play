@@ -47,7 +47,7 @@
                     <tbody>
                         @forelse ($otps as $otp)
                             <tr>
-                                <td>{{ $loop->iteration }}</td>
+                                <td>{{ $otps->firstItem() + $loop->index }}</td>
                                 <td>{{ $otp->code }}</td>
                                 <td>{{ $otp->user?->name ?? '—' }}</td>
                                 <td>{{ $otp->purpose ?? '—' }}</td>

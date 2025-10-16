@@ -48,7 +48,7 @@
                     <tbody>
                         @forelse($dailyGoals as $goal)
                             <tr>
-                                <td>{{ $loop->iteration }}</td>
+                                <td>{{ $dailyGoals->firstItem() + $loop->index }}</td>
                                 <td>{{ $goal->kid->display_name ?? '-' }}</td>
                                 <td>{{ $goal->game->description ?? '-' }}</td>
                                 <td>{{ $goal->title }}</td>
