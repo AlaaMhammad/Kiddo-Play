@@ -90,7 +90,6 @@ Route::middleware(['isAuth'])->prefix('admin')->name('admin.')->group(function (
 
         // Kids
         Route::resource('kids', KidController::class)->only(['index', 'show', 'edit', 'update']);
-        Route::resource('parent-children', ParentChildController::class)->only(['index']);
         Route::resource('kid-achievements', KidAchievementController::class)->only(['index', 'show']);
         Route::resource('kid-lesson-progresses', KidLessonProgressController::class)->only(['index', 'show']);
         Route::resource('kid-sessions', KidSessionController::class)->only(['index', 'show']);

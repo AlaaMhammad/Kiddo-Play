@@ -4,11 +4,13 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Mail\VerfiyEmail;
+use App\Models\Kid;
 use App\Models\User;
 use App\Models\VerfactionEmail;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 
@@ -19,10 +21,10 @@ class AuthController extends Controller
         return  view('auth.login');
     }
 
-    // function register()
-    // {
-    //     return  view('auth.register');
-    // }
+    function register()
+    {
+        return  view('auth.register');
+    }
 
     function signin(Request $request)
     {
@@ -62,6 +64,58 @@ class AuthController extends Controller
 
         // return redirect()->back();
     }
+
+
+    public function signup(Request $request)
+    {
+        // Validate Parent Info
+        $request->validate([
+            'parentName' => 'required|string|max:255',
+            'parentEmail' => 'required|email|unique:users,email',
+            'parentPassword' => 'required|confirmed|min:6', // parentPassword_confirmation
+            'children.*.name' => 'required|string|max:255',
+            'children.*.dob' => 'required|date',
+            'children.*.gender' => 'required|in:male,female,other',
+        ]);
+
+        // Get parent role id
+        $parentRoleId = DB::table('roles')->where('name', 'parent')->value('id');
+
+        // Create Parent User
+        $parent = User::create([
+            'name' => $request->parentName,
+            'email' => $request->parentEmail,
+            'password' => Hash::make($request->parentPassword),
+            'role_id' => $parentRoleId,
+        ]);
+
+        // Create Children
+        if ($request->has('children')) {
+            foreach ($request->children as $child) {
+                // Create Child using Eloquent
+                $kid = Kid::create([
+                    'user_id' => $parent->id, // إذا كنت تستخدم جدول parent_children فلا تحتاجه هنا
+                    'display_name' => $child['name'],
+                    'dob' => $child['dob'],
+                    'gender' => $child['gender'],
+                    'points' => 0,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+
+                // ربط الطفل بالوالد في جدول parent_children
+                $parent->children()->attach($kid->id);
+            }
+        }
+
+
+        // return redirect()->route('login')->with('verify', 'تم تسجيل الحساب بنجاح وتم ارسال رابط التفعيل عبر الايميل');
+        return redirect()->route('login')->with([
+            'success' => 'Account and children created successfully! Please log in.'
+        ]);
+    }
+
+
 
     // function signup(Request $request)
     // {

@@ -1,7 +1,9 @@
 <!doctype html>
 
-<html lang="en" class="layout-wide customizer-hide" dir="ltr" data-skin="default" data-assets-path="{{ asset('dashboard/assets/"
-    data-template="vertical-menu-template')}}" data-bs-theme="light">
+<html lang="en" class="layout-wide customizer-hide" dir="ltr" data-skin="default"
+    data-assets-path="{{ asset('dashboard/assets/"
+                data-template="vertical-menu-template') }}"
+    data-bs-theme="light">
 
 <head>
     <meta charset="utf-8" />
@@ -59,12 +61,29 @@
 
 <body>
     <!-- Content -->
-
     <div class="container-xxl">
         <div class="authentication-wrapper authentication-basic container-p-y">
             <div class="authentication-inner">
                 <!-- Login -->
+
                 <div class="card px-sm-6 px-0">
+
+                    @if (session('success'))
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            {{ session('success') }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"
+                                aria-label="Close"></button>
+                        </div>
+                    @endif
+
+                    @if (session('error'))
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            {{ session('error') }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"
+                                aria-label="Close"></button>
+                        </div>
+                    @endif
+                    
                     <div class="card-body">
                         <!-- Logo -->
                         <div class="app-brand justify-content-center">
@@ -122,7 +141,8 @@
                                 </span>
                                 <span class="app-brand-text demo text-heading fw-bold">Sneat</span> --}}
 
-                                <img src="{{asset('dashboard/assets/img/kiddo.png')}}" alt="logo"  style="object-fit: cover; width: 20vw; height: 100px;">
+                                <img src="{{ asset('dashboard/assets/img/kiddo.png') }}" alt="logo"
+                                    style="object-fit: cover; width: 20vw; height: 100px;">
                                 {{-- <img src="{{asset('dashboard/assets/img/kiddoplay.jpg')}}" alt="logo" width="0" height="40" style="object-fit: cover"> --- IGNORE --- --}}
                             </a>
                         </div>
@@ -130,7 +150,7 @@
                         <h4 class="mb-1">Welcome to Kiddo Play 👋</h4>
                         <p class="mb-6">Please sign-in to your account</p>
 
-                        <form id="formAuthentication" class="mb-6" action="{{route('signin')}}" method="post">
+                        <form id="formAuthentication" class="mb-6" action="{{ route('signin') }}" method="post">
                             @csrf
                             @method('POST')
                             @if ($errors->any())
@@ -145,9 +165,11 @@
 
                             <div class="mb-6 form-control-validation">
                                 <label for="email" class="form-label">Email</label>
-                                <input type="email" class="form-control @error('email') is-invalid
-                                @enderror" id="email" name="email" placeholder="Enter your email " value="{{ old('email') }}"
-                                    autofocus />
+                                <input type="email"
+                                    class="form-control @error('email') is-invalid
+                                @enderror"
+                                    id="email" name="email" placeholder="Enter your email "
+                                    value="{{ old('email') }}" autofocus />
                                 @error('email')
                                     <div class="invalid-feedback">
                                         {{ $message }}
@@ -157,8 +179,10 @@
                             <div class="mb-6 form-password-toggle form-control-validation">
                                 <label class="form-label" for="password">Password</label>
                                 <div class="input-group input-group-merge">
-                                    <input type="password" id="password" class="form-control @error('password') is-invalid
-                                    @enderror" name="password"
+                                    <input type="password" id="password"
+                                        class="form-control @error('password') is-invalid
+                                    @enderror"
+                                        name="password"
                                         placeholder="&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;"
                                         aria-describedby="password" />
                                     <span class="input-group-text cursor-pointer"><i
@@ -179,7 +203,15 @@
                                 </div>
                             </div>
                             <div class="mb-6">
-                                <button class="btn btn-primary d-grid w-100" >Login</button>
+                                <button class="btn btn-primary d-grid w-100">Login</button>
+                            </div>
+
+                            <div class="text-center">
+                                <a href="{{ route('register') }}"
+                                    class="d-flex align-items-center justify-content-center">
+                                    <i class="bx bx-user-plus bx-sm me-2"></i>
+                                    Create New Account ?
+                                </a>
                             </div>
                         </form>
                     </div>

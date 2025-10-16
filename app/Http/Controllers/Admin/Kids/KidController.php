@@ -9,6 +9,7 @@ use App\Models\ParentChild;
 use App\Models\User;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class KidController extends Controller
 {
@@ -17,9 +18,22 @@ class KidController extends Controller
      */
     public function index()
     {
-        $kids = Kid::with(['user', 'avatar'])->latest()->paginate(10);
+       /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        if ($user->role->name === 'admin') {
+            // Admin يشوف كل الأطفال
+            $kids = Kid::with(['user', 'avatar'])->latest()->paginate(10);
+        } else if ($user->role->name === 'parent') {
+            // Parent يشوف أطفال الخاصة فيه فقط
+            $kids = $user->children()->paginate(10);
+        } else {
+            abort(403, 'Unauthorized');
+        }
+
         return view('admin.kids.index', compact('kids'));
     }
+
 
     /**
      * Show the form for creating a new resource.

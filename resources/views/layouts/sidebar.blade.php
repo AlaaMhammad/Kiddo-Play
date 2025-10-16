@@ -303,11 +303,6 @@
                             <div>{{ __('menu.kids_list') }}</div>
                         </a>
                     </li>
-                    <li class="menu-item {{ request()->routeIs('admin.parent-children.index') ? 'active' : '' }}">
-                        <a href="{{ route('admin.parent-children.index') }}" class="menu-link">
-                            <div>{{ __('menu.parent_child_links') }}</div>
-                        </a>
-                    </li>
                     <li class="menu-item {{ request()->routeIs('admin.kid-achievements.index') ? 'active' : '' }}">
                         <a href="{{ route('admin.kid-achievements.index') }}" class="menu-link">
                             <div>{{ __('menu.kid_achievements') }}</div>

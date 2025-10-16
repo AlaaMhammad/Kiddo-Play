@@ -7,19 +7,29 @@ use App\Models\ParentChild;
 use App\Models\User;
 use App\Models\Kid;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class ParentChildController extends Controller
 {
     public function index()
     {
-        $parentChildren = ParentChild::with(['parent', 'kid'])->latest()->paginate(10);
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        if ($user->role->name === 'admin') {
+            // Admin يشوف كل الآباء والأطفال المرتبطين
+            $parentChildren = ParentChild::with(['parent', 'kid'])->latest()->paginate(10);
+        } else {
+            abort(403, 'Unauthorized');
+        }
+
         return view('admin.parent-children.index', compact('parentChildren'));
     }
 
     public function create()
     {
         // جلب الآباء فقط عبر العلاقة role
-        $parents = User::whereHas('role', function($q) {
+        $parents = User::whereHas('role', function ($q) {
             $q->where('name', 'parent');
         })->pluck('name', 'id');
 
@@ -54,7 +64,7 @@ class ParentChildController extends Controller
 
     public function edit(ParentChild $parentChild)
     {
-        $parents = User::whereHas('role', function($q) {
+        $parents = User::whereHas('role', function ($q) {
             $q->where('name', 'parent');
         })->pluck('name', 'id');
 
