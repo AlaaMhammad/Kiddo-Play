@@ -69,20 +69,11 @@
                 </table>
             </div>
 
-            <div class="d-flex justify-content-between align-items-center mt-3">
-                <!-- Pagination links -->
-                <div>
-                    {{ $kidAchievements->links() }}
-                </div>
-
-                <!-- Page info -->
-                <div class="text-muted">
-                    Page {{ $kidAchievements->currentPage() }} of {{ $kidAchievements->lastPage() }}
-                    - Total items: {{ $kidAchievements->total() }}
-                </div>
-                Remaining items:
-                {{ $kidAchievements->total() - $kidAchievements->currentPage() * $kidAchievements->perPage() }}
+            <!-- Pagination links -->
+            <div class="mt-4">
+                {{ $kidAchievements->links() }}
             </div>
+
         </div>
     </div>
 </x-admin>

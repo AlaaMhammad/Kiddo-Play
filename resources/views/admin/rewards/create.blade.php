@@ -17,6 +17,8 @@
 
             <x-form.number name="points_required" label="Points Required" value="0" required />
 
+            {{-- <x-form.checkbox name="is_claimed" label="Claimed" /> --}}
+
             <x-form.button label="Save Reward" />
         </form>
     </div>

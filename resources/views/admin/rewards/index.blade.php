@@ -7,6 +7,21 @@
         </a>
     </div>
 
+    <!-- Display success/error messages -->
+    @if (session('success'))
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            {{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+    @if (session('error'))
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            {{ session('error') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+
+
     <div class="card">
         <div class="card-header d-flex justify-content-between align-items-center">
             <h5 class="mb-0">All Rewards</h5>
@@ -35,7 +50,13 @@
                                 <td>{{ $reward->dailyGoal->title ?? '-' }}</td>
                                 <td>{{ $reward->title }}</td>
                                 <td>{{ $reward->points_required }}</td>
-                                <td>{{ $reward->is_claimed ? 'Yes' : 'No' }}</td>
+                                <td class="text-center">
+                                    @if ($reward->is_claimed)
+                                        <i class="bx bx-check-circle text-success fs-3" title="Claimed"></i>
+                                    @else
+                                        <i class="bx bx-x-circle text-danger fs-3" title="Not Claimed"></i>
+                                    @endif
+                                </td>
                                 <td class="text-center">
                                     <a href="{{ route('admin.rewards.show', $reward->id) }}"
                                         class="btn btn-sm btn-info"><i class="bx bx-show"></i></a>
@@ -60,19 +81,10 @@
                 </table>
             </div>
 
-            <div class="d-flex justify-content-between align-items-center mt-3">
-                <!-- Pagination links -->
-                <div>
-                    {{ $rewards->links() }}
-                </div>
-
-                <!-- Page info -->
-                <div class="text-muted">
-                    Page {{ $rewards->currentPage() }} of {{ $rewards->lastPage() }}
-                    - Total items: {{ $rewards->total() }}
-                </div>
-                Remaining items: {{ $rewards->total() - $rewards->currentPage() * $rewards->perPage() }}
+            <div class="mt-4">
+                {{ $rewards->links() }}
             </div>
+
         </div>
     </div>
 </x-admin>

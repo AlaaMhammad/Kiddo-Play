@@ -68,19 +68,8 @@
                 </table>
             </div>
 
-            <div class="d-flex justify-content-between align-items-center mt-3">
-                <!-- Pagination links -->
-                <div>
-                    {{ $settings->links() }}
-                </div>
-
-                <!-- Page info -->
-                <div class="text-muted">
-                    Page {{ $settings->currentPage() }} of {{ $settings->lastPage() }}
-                    - Total settings: {{ $settings->total() }}
-                </div>
-                Remaining settings: {{ $settings->total() - $settings->currentPage() * $settings->perPage() }}
+            <div class="mt-4">
+                {{ $settings->links() }}
             </div>
         </div>
-    </div>
 </x-admin>

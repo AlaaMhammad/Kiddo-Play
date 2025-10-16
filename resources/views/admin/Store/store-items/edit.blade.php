@@ -16,12 +16,13 @@
             <x-form.input name="type" label="Type" value="{{ $store_item->type }}" />
             <x-form.textarea name="metadata" label="Metadata (JSON)" rows="3"
                 value="{{ json_encode($store_item->metadata) }}" />
+            <x-form.checkbox name="is_active" label="Is Active" :checked="$store_item->is_active" />
 
-            <div class="mb-3 form-check">
+            {{-- <div class="mb-3 form-check">
                 <input type="checkbox" class="form-check-input" id="is_active" name="is_active" value="1"
                     {{ $store_item->is_active ? 'checked' : '' }}>
                 <label class="form-check-label" for="is_active">Active</label>
-            </div>
+            </div> --}}
 
             <button class="btn btn-success">Update Item</button>
         </form>

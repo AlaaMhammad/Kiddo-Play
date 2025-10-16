@@ -6,6 +6,22 @@
         </a>
     </div>
 
+    @if (session('success'))
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle me-2"></i>
+            {{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+
+    @if (session('error'))
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="bi bi-x-circle me-2"></i>
+            {{ session('error') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+
     <div class="card">
         <div class="card-header d-flex justify-content-between align-items-center">
             <h5 class="mb-0">All Store Items</h5>
@@ -64,19 +80,8 @@
                 </table>
             </div>
 
-            <div class="d-flex justify-content-between align-items-center mt-3">
-                <!-- Pagination links -->
-                <div>
-                    {{ $items->links() }}
-                </div>
-
-                <!-- Page info -->
-                <div class="text-muted">
-                    Page {{ $items->currentPage() }} of {{ $items->lastPage() }}
-                    - Total items: {{ $items->total() }}
-                </div>
-                Remaining items: {{ $items->total() - $items->currentPage() * $items->perPage() }}
+            <div class="mt-4">
+                {{ $items->links() }}
             </div>
         </div>
-    </div>
 </x-admin>

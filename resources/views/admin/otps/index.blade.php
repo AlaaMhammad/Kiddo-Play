@@ -6,6 +6,22 @@
         </a>
     </div>
 
+    @if (session('success'))
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle me-2"></i>
+            {{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+
+    @if (session('error'))
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="bi bi-x-circle me-2"></i>
+            {{ session('error') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+
     <div class="card">
         <div class="card-header d-flex justify-content-between align-items-center">
             <h5 class="mb-0">All OTPs</h5>
@@ -40,8 +56,8 @@
                                 <td class="text-center">
                                     <a href="{{ route('admin.otps.show', $otp->id) }}" class="btn btn-sm btn-info"><i
                                             class="bx bx-show"></i></a>
-                                    <a href="{{ route('admin.otps.edit', $otp->id) }}" class="btn btn-sm btn-warning"><i
-                                            class="bx bx-edit"></a>
+                                    <a href="{{ route('admin.otps.edit', $otp->id) }}"
+                                        class="btn btn-sm btn-warning"><i class="bx bx-edit"></a>
                                     <form action="{{ route('admin.otps.destroy', $otp->id) }}" method="POST"
                                         class="d-inline">
                                         @csrf

@@ -39,12 +39,15 @@ class PurchaseController extends Controller
             'kid_id' => 'required|exists:kids,id',
             'store_item_id' => 'required|exists:store_items,id',
             'points_used' => 'required|integer|min:0',
-            'details' => 'nullable|json',
+            'details' => 'nullable|string',
         ]);
+        if (!empty($validated['details'])) {
+            $validated['details'] = json_encode($validated['details']);
+        }
 
         Purchase::create($validated);
 
-        return redirect()->route('admin.Store.purchases.index')->with('success', 'Purchase created successfully.');
+        return redirect()->route('admin.purchases.index')->with('success', 'Purchase created successfully.');
     }
 
     /**
@@ -76,12 +79,16 @@ class PurchaseController extends Controller
             'kid_id' => 'required|exists:kids,id',
             'store_item_id' => 'required|exists:store_items,id',
             'points_used' => 'required|integer|min:0',
-            'details' => 'nullable|json',
+            'details' => 'nullable|string',
         ]);
+
+        if (!empty($validated['details'])) {
+            $validated['details'] = json_encode($validated['details']);
+        }
 
         $purchase->update($validated);
 
-        return redirect()->route('admin.Store.purchases.index')->with('success', 'Purchase updated successfully.');
+        return redirect()->route('admin.purchases.index')->with('success', 'Purchase updated successfully.');
     }
 
     /**
@@ -90,6 +97,6 @@ class PurchaseController extends Controller
     public function destroy(Purchase $purchase)
     {
         $purchase->delete();
-        return redirect()->route('admin.Store.purchases.index')->with('success', 'Purchase deleted successfully.');
+        return redirect()->route('admin.purchases.index')->with('success', 'Purchase deleted successfully.');
     }
 }

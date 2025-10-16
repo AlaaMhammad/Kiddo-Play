@@ -45,7 +45,8 @@ class AvatarController extends Controller
             'is_active'    => $request->boolean('is_active'),
         ]);
 
-        return redirect()->route('admin.avatars.index')->with('success', 'Avatar created successfully.');
+        return redirect()->route('admin.avatars.index')->with(['success'=>'Avatar created successfully.',
+        'action' => 'create']);
     }
     /**
      * Display the specified resource.
@@ -76,13 +77,14 @@ class AvatarController extends Controller
         ]);
 
         $data = $request->only(['name', 'cost_points', 'is_active']);
+        $data['is_active'] = $request->boolean('is_active');
         if ($request->hasFile('image_url')) {
             $data['image_url'] = $request->file('image_url')->store('avatars', 'public');
         }
 
         $avatar->update($data);
 
-        return redirect()->route('admin.avatars.index')->with('success', 'Avatar updated successfully.');
+        return redirect()->route('admin.avatars.index')->with(['success'=> 'Avatar updated successfully.', 'action' => 'update']);
     }
 
     /**
@@ -91,6 +93,9 @@ class AvatarController extends Controller
     public function destroy(Avatar $avatar)
     {
         $avatar->delete();
-        return redirect()->route('admin.avatars.index')->with('success', 'Avatar deleted successfully.');
+        return redirect()->route('admin.avatars.index')->with([
+            'success' => 'Avatar deleted successfully.',
+            'action' => 'delete',
+        ]);
     }
 }

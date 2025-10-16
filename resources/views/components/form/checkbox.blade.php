@@ -1,6 +1,7 @@
 @props(['name', 'label' => null, 'checked' => false])
 
 <div class="form-check mb-3">
+    <input type="hidden" name="{{ $name }}" value="0">
     <input type="checkbox"
             id="{{ $name }}"
             name="{{ $name }}"

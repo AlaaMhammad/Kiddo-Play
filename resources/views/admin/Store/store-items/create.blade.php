@@ -12,11 +12,13 @@
             <x-form.input name="cost_points" label="Cost Points" type="number" required />
             <x-form.input name="type" label="Type" />
             <x-form.textarea name="metadata" label="Metadata (JSON)" rows="3" />
+            <x-form.checkbox name="is_active" label="Is Active" />
 
-            <div class="mb-3 form-check">
+            {{-- <div class="mb-3 form-check">
+
                 <input type="checkbox" class="form-check-input" id="is_active" name="is_active" value="1" checked>
                 <label class="form-check-label" for="is_active">Active</label>
-            </div>
+            </div> --}}
 
             <button class="btn btn-primary">Save Item</button>
         </form>

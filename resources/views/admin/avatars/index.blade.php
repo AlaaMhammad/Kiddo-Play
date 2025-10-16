@@ -7,9 +7,20 @@
         </a>
     </div>
 
-    @if ('success' == session('status'))
-        <div class="alert alert-success alert-dismissible" role="alert">
-            {{ session('status') }}
+
+    @if (session('success'))
+        @php
+            $action = session('action');
+            $alertClass = match ($action) {
+                'create' => 'alert-success', // أخضر
+                'update' => 'alert-primary', // أزرق
+                'delete' => 'alert-danger', // أحمر
+                default => 'alert-secondary', // رمادي افتراضي
+            };
+        @endphp
+
+        <div class="alert {{ $alertClass }} alert-dismissible fade show" role="alert">
+            {{ session('success') }}
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     @endif
@@ -37,13 +48,8 @@
                         @forelse ($avatars as $avatar)
                             <tr>
                                 <td>{{ $loop->iteration }}</td>
-                                {{-- <td><img src="{{ asset('storage/' . $avatar->image_url) }}" width="60"
-                                        height="60" class="rounded-circle"></td> --}}
-                                <td>
-                                    <img src="{{ asset($avatar->image_url) }}" width="60" height="60"
-                                        class="rounded-circle">
-                                </td>
-
+                                <td><img src="{{ asset('storage/' . $avatar->image_url) }}" width="60"
+                                        height="60" class="rounded-circle object-fit-cover"></td>
                                 <td>{{ $avatar->name }}</td>
                                 <td>{{ $avatar->cost_points }}</td>
                                 <td>{!! $avatar->is_active
@@ -71,18 +77,8 @@
                 </table>
             </div>
 
-            <div class="d-flex justify-content-between align-items-center mt-3">
-                <!-- Pagination links -->
-                <div>
-                    {{ $avatars->links() }}
-                </div>
-
-                <!-- Page info -->
-                <div class="text-muted">
-                    Page {{ $avatars->currentPage() }} of {{ $avatars->lastPage() }}
-                    - Total items: {{ $avatars->total() }}
-                </div>
-                Remaining items: {{ $avatars->total() - ($avatars->currentPage() * $avatars->perPage()) }}
+            <div class="mt-4">
+                {{ $avatars->links() }}
             </div>
 
         </div>

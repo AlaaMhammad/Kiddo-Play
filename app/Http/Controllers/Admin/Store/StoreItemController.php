@@ -35,13 +35,16 @@ class StoreItemController extends Controller
             'description' => 'nullable|string',
             'cost_points' => 'required|integer|min:0',
             'type' => 'nullable|string|max:100',
-            'metadata' => 'nullable|json',
+            'metadata' => 'nullable|string',
             'is_active' => 'boolean',
         ]);
-
+        // تحويل النص إلى JSON صالح إذا تم إدخاله
+        if (!empty($validated['metadata'])) {
+            $validated['metadata'] = json_encode($validated['metadata']);
+        }
         StoreItem::create($validated);
 
-        return redirect()->route('admin.Store.store-items.index')
+        return redirect()->route('admin.store-items.index')
             ->with('success', 'Store item created successfully.');
     }
 
@@ -71,13 +74,17 @@ class StoreItemController extends Controller
             'description' => 'nullable|string',
             'cost_points' => 'required|integer|min:0',
             'type' => 'nullable|string|max:100',
-            'metadata' => 'nullable|json',
+            'metadata' => 'nullable|string',
             'is_active' => 'boolean',
         ]);
 
+        if (!empty($validated['metadata'])) {
+            $validated['metadata'] = json_encode($validated['metadata']);
+        }
+
         $store_item->update($validated);
 
-        return redirect()->route('admin.Store.store-items.index')
+        return redirect()->route('admin.store-items.index')
             ->with('success', 'Store item updated successfully.');
     }
 
@@ -88,7 +95,7 @@ class StoreItemController extends Controller
     {
         $store_item->delete();
 
-        return redirect()->route('admin.Store.store-items.index')
+        return redirect()->route('admin.store-items.index')
             ->with('success', 'Store item deleted successfully.');
     }
 }

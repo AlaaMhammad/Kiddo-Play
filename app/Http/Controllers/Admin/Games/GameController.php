@@ -33,7 +33,10 @@ class GameController extends Controller
 
         Game::create($data);
 
-        return redirect()->route('games.index')->with('success', 'Game created successfully.');
+        return redirect()->route('admin.games.index')->with([
+            'success' => 'Game created successfully.',
+            'action' => 'create',
+        ]);
     }
 
     public function edit(Game $game)
@@ -55,12 +58,18 @@ class GameController extends Controller
 
         $game->update($data);
 
-        return redirect()->route('games.index')->with('success', 'Game updated successfully.');
+        return redirect()->route('admin.games.index')->with([
+            'success' => 'Game updated successfully.',
+            'action' => 'update',
+        ]);
     }
 
     public function destroy(Game $game)
     {
         $game->delete();
-        return redirect()->route('games.index')->with('success', 'Game deleted successfully.');
+        return redirect()->route('admin.games.index')->with([
+            'success' => 'Game deleted successfully.',
+            'action' => 'delete',
+        ]);
     }
 }

@@ -70,21 +70,9 @@
                 </table>
             </div>
 
-            <div class="d-flex justify-content-between align-items-center mt-3">
-                <!-- Pagination links -->
-                <div>
-                    {{ $parentChildren->links() }}
-                </div>
-
-                <!-- Page info -->
-                <div class="text-muted">
-                    Page {{ $parentChildren->currentPage() }} of {{ $parentChildren->lastPage() }}
-                    - Total items: {{ $parentChildren->total() }}
-                </div>
-                Remaining items:
-                {{ $parentChildren->total() - $parentChildren->currentPage() * $parentChildren->perPage() }}
+            <div class="mt-4">
+                {{ $parentChildren->links() }}
             </div>
         </div>
-    </div>
 
 </x-admin>

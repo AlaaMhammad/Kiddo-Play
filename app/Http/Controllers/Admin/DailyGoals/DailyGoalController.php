@@ -21,12 +21,28 @@ class DailyGoalController extends Controller
 
     public function create()
     {
-        $kids = Kid::all();
-        $games = Game::all();
+        $kids = Kid::all()->map(fn($kid) => [
+            'id' => $kid->id,
+            'name' => $kid->display_name,
+        ])->toArray();
+
+        $games = Game::all()->map(fn($game) => [
+            'id' => $game->id,
+            'name' => $game->description, // أو أي حقل يمثل اسم اللعبة
+        ])->toArray();
+
         $parents = User::whereHas('role', fn($q) => $q->where('name', 'parent'))
             ->get()
-            ->map(fn($user) => ['id' => $user->id, 'name' => $user->name]);
-        $avatars = Avatar::all(); // جلب كل الصور/أفاتار
+            ->map(fn($user) => [
+                'id' => $user->id,
+                'name' => $user->name
+            ])->toArray();
+
+        $avatars = Avatar::all()->map(fn($avatar) => [
+            'id' => $avatar->id,
+            'name' => $avatar->name, // أو أي حقل يوضح الصورة/الاسم
+        ])->toArray();
+
         return view('admin.daily-goals.create', compact('kids', 'games', 'parents', 'avatars'));
     }
 
@@ -45,15 +61,24 @@ class DailyGoalController extends Controller
         $data['is_completed'] = $request->has('is_completed');
         DailyGoal::create($data);
 
-        return redirect()->route('daily-goals.index')->with('success', 'Daily Goal created successfully.');
+        return redirect()->route('admin.daily-goals.index')->with('success', 'Daily Goal created successfully.');
     }
 
     public function edit(DailyGoal $dailyGoal)
     {
-        $kids = Kid::all();
-        $games = Game::all();
+        $kids = Kid::all()->map(fn($kid) => [
+            'id' => $kid->id,
+            'name' => $kid->display_name,
+        ])->toArray();
+
+        $games = Game::all()->map(fn($game) => [
+            'id' => $game->id,
+            'name' => $game->description, // أو أي حقل يمثل اسم اللعبة
+        ])->toArray();
+
         return view('admin.daily-goals.edit', compact('dailyGoal', 'kids', 'games'));
     }
+
 
     public function update(Request $request, DailyGoal $dailyGoal)
     {
@@ -70,7 +95,7 @@ class DailyGoalController extends Controller
         $data['is_completed'] = $request->has('is_completed');
         $dailyGoal->update($data);
 
-        return redirect()->route('daily-goals.index')->with('success', 'Daily Goal updated successfully.');
+        return redirect()->route('admin.daily-goals.index')->with('success', 'Daily Goal updated successfully.');
     }
 
     public function show(DailyGoal $dailyGoal)
@@ -81,6 +106,6 @@ class DailyGoalController extends Controller
     public function destroy(DailyGoal $dailyGoal)
     {
         $dailyGoal->delete();
-        return redirect()->route('daily-goals.index')->with('success', 'Daily Goal deleted successfully.');
+        return redirect()->route('admin.daily-goals.index')->with('success', 'Daily Goal deleted successfully.');
     }
 }

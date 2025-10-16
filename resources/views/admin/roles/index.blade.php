@@ -56,18 +56,8 @@
             </table>
         </div>
 
-        <div class="d-flex justify-content-between align-items-center mt-3">
-            <!-- Pagination links -->
-            <div>
-                {{ $roles->links() }}
-            </div>
-
-            <!-- Page info -->
-            <div class="text-muted">
-                Page {{ $roles->currentPage() }} of {{ $roles->lastPage() }}
-                - Total items: {{ $roles->total() }}
-            </div>
-            Remaining items: {{ $roles->total() - $roles->currentPage() * $roles->perPage() }}
+        <div class="mt-4">
+            {{ $roles->links() }}
         </div>
     </div>
 </x-admin>

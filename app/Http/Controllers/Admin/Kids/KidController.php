@@ -118,18 +118,20 @@ class KidController extends Controller
             'parent_id' => 'nullable|exists:users,id',
         ]);
 
-        // تحديث user_id لو تم اختيار parent_id جديد
+        // تحديث العلاقة مع الأهل
         if (!empty($validated['parent_id'])) {
-            $validated['user_id'] = $validated['parent_id'];
-
+            // تحديث أو إنشاء العلاقة في جدول parent_children
             ParentChild::updateOrCreate(
                 ['kid_id' => $kid->id],
                 ['parent_id' => $validated['parent_id']]
             );
+
+            // تحديث user_id في جدول kids ليكون نفس الأب (اختياري)
+            $validated['user_id'] = $validated['parent_id'];
         }
 
-        // تحديث بيانات الطفل
-        $kid->update($validated);
+        // لا ترسل parent_id إلى جدول kids لأنه غير موجود هناك
+        $kid->update(collect($validated)->except('parent_id')->toArray());
 
         return redirect()
             ->route('admin.kids.index')

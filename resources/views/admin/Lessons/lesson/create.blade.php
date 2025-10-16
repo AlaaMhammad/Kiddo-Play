@@ -28,11 +28,7 @@
 
             <x-form.input type="number" name="order" label="Order" value="0" />
 
-            <div class="mb-3 form-check">
-                <input type="checkbox" name="is_published" id="is_published" value="1" class="form-check-input"
-                    checked>
-                <label for="is_published" class="form-check-label">Published</label>
-            </div>
+            <x-form.checkbox name="is_published" label="Published" checked />
 
             <button class="btn btn-primary">Save Lesson</button>
         </form>

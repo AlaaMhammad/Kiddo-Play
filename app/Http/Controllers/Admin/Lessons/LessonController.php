@@ -42,7 +42,7 @@ class LessonController extends Controller
 
         Lesson::create($validated);
 
-        return redirect()->route('admin.lesson.index')->with('success', 'Lesson created successfully.');
+        return redirect()->route('admin.lessons.index')->with('success', 'Lesson created successfully.');
     }
 
     /**
@@ -78,7 +78,7 @@ class LessonController extends Controller
 
         $lesson->update($validated);
 
-        return redirect()->route('admin.lesson.index')->with('success', 'Lesson updated successfully.');
+        return redirect()->route('admin.lessons.index')->with('success', 'Lesson updated successfully.');
     }
 
     /**
@@ -87,6 +87,6 @@ class LessonController extends Controller
     public function destroy(Lesson $lesson)
     {
         $lesson->delete();
-        return redirect()->route('admin.lesson.index')->with('success', 'Lesson deleted successfully.');
+        return redirect()->route('admin.lessons.index')->with('success', 'Lesson deleted successfully.');
     }
 }

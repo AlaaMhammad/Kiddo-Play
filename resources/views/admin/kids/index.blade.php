@@ -7,6 +7,14 @@
         </a>
     </div>
 
+
+    @if (session('success'))
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            {{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+
     <div class="card">
         <div class="card-header d-flex justify-content-between align-items-center">
             <h5 class="mb-0">All Kids</h5>
@@ -22,7 +30,7 @@
                         <tr>
                             <th>ID</th>
                             <th>Display Name</th>
-                            <th>User</th>
+                            <th>Parent</th>
                             <th>Gender</th>
                             <th>Points</th>
                             <th>Avatar</th>
@@ -69,18 +77,8 @@
                 </table>
             </div>
 
-            <div class="d-flex justify-content-between align-items-center mt-3">
-                <!-- Pagination links -->
-                <div>
-                    {{ $kids->links() }}
-                </div>
-
-                <!-- Page info -->
-                <div class="text-muted">
-                    Page {{ $kids->currentPage() }} of {{ $kids->lastPage() }}
-                    - Total items: {{ $kids->total() }}
-                </div>
-                Remaining items: {{ $kids->total() - $kids->currentPage() * $kids->perPage() }}
+            <div class="mt-4">
+                {{ $kids->links() }}
             </div>
         </div>
     </div>

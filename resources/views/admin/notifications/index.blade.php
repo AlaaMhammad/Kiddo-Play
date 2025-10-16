@@ -5,6 +5,21 @@
             <i class="bx bx-arrow-back"></i> Back
         </a>
     </div>
+    @if (session('success'))
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle me-2"></i>
+            {{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+
+    @if (session('error'))
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="bi bi-x-circle me-2"></i>
+            {{ session('error') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
 
     <div class="card">
         <div class="card-header d-flex justify-content-between align-items-center">
@@ -62,21 +77,9 @@
                     </tbody>
                 </table>
             </div>
-            
-            <div class="d-flex justify-content-between align-items-center mt-3">
-                <!-- Pagination links -->
-                <div>
-                    {{ $notifications->links() }}
-                </div>
 
-                <!-- Page info -->
-                <div class="text-muted">
-                    Page {{ $notifications->currentPage() }} of {{ $notifications->lastPage() }}
-                    - Total items: {{ $notifications->total() }}
-                </div>
-                Remaining items:
-                {{ $notifications->total() - $notifications->currentPage() * $notifications->perPage() }}
+            <div class="mt-4">
+                {{ $notifications->links() }}
             </div>
         </div>
-    </div>
 </x-admin>

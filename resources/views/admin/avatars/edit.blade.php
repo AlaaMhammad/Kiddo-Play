@@ -48,7 +48,8 @@
                 </div>
 
                 <div class="form-check form-switch mb-3">
-                    <input type="checkbox" name="is_active" class="form-check-input @error('is_active') is-invalid
+                    <input type="hidden" name="is_active" value="0">
+                    <input type="checkbox" name="is_active" value="1" class="form-check-input @error('is_active') is-invalid
                     @enderror" {{ $avatar->is_active ? 'checked' : '' }}>
                     <label class="form-check-label">Active</label>
                     @error('is_active')

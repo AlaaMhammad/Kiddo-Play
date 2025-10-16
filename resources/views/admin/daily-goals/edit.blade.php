@@ -1,42 +1,32 @@
-<x-admin title="Edit Kid">
+<x-admin title="Edit Daily Goal">
 
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h4 class="fw-bold mb-0">Edit kid</h4>
+        <h4 class="fw-bold mb-0">Edit Daily Goal</h4>
         <div class="mb-4">
             <a href="{{ route('admin.daily-goals.index') }}" class="btn btn-secondary">← Back</a>
         </div>
     </div>
 
     <div class="card p-4">
-        <form action="{{ route('admin.daily-goals.update', $kid->id) }}" method="POST">
+        <form action="{{ route('admin.daily-goals.update', $dailyGoal->id) }}" method="POST">
             @csrf
             @method('PUT')
 
-            {{-- Parent --}}
-            <x-form.select name="parent_id" label="Parent" :options="$parents" :selected="$kid->user_id" required />
+            <x-form.select name="kid_id" label="Kid" :options="$kids" :selected="$dailyGoal->kid_id" required />
 
-            {{-- Display Name --}}
-            <x-form.input name="display_name" label="Display Name" :value="$kid->display_name" />
+            <x-form.select name="game_id" label="Game" :options="$games" :selected="$dailyGoal->game_id" placeholder="-- None --" />
 
-            {{-- Date of Birth --}}
-            <x-form.date name="dob" label="Date of Birth" :value="$kid->dob" />
+            <x-form.input name="title" label="Title" :value="$dailyGoal->title" required />
 
-            {{-- Gender --}}
-            <x-form.select name="gender" label="Gender" :options="[
-                ['id' => 'male', 'name' => 'Male'],
-                ['id' => 'female', 'name' => 'Female'],
-                ['id' => 'other', 'name' => 'Other'],
-            ]" :selected="$kid->gender" />
+            <x-form.textarea name="description" label="Description" :value="$dailyGoal->description" />
 
-            {{-- Avatar --}}
-            <x-form.select name="avatar_id" label="Avatar" :options="$avatars" :selected="$kid->avatar_id"
-                placeholder="-- None --" />
+            <x-form.number name="target_points" label="Target Points" :value="$dailyGoal->target_points ?? 0" />
 
-            {{-- Points --}}
-            <x-form.number name="points" label="Points" :value="$kid->points" />
+            <x-form.checkbox name="is_completed" label="Completed" :checked="$dailyGoal->is_completed" />
 
-            {{-- Submit Button --}}
-            <x-form.button label="Update Kid" />
+            <x-form.date name="goal_date" label="Goal Date" :value="$dailyGoal->goal_date->format('Y-m-d')" required />
+
+            <x-form.button label="Update Daily Goal" />
         </form>
     </div>
 </x-admin>

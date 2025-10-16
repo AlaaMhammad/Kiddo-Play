@@ -8,9 +8,18 @@
         </a>
     </div>
 
-    @if ('success' == session('status'))
-        <div class="alert alert-success alert-dismissible" role="alert">
-            {{ session('status') }}
+    @if (session('success'))
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle me-2"></i>
+            {{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+
+    @if (session('error'))
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="bi bi-x-circle me-2"></i>
+            {{ session('error') }}
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     @endif
@@ -71,18 +80,8 @@
                 </table>
             </div>
 
-            <div class="d-flex justify-content-between align-items-center mt-3">
-                <!-- Pagination links -->
-                <div>
-                    {{ $users->links() }}
-                </div>
-
-                <!-- Page info -->
-                <div class="text-muted">
-                    Page {{ $users->currentPage() }} of {{ $users->lastPage() }}
-                    - Total items: {{ $users->total() }}
-                </div>
-                Remaining items: {{ $users->total() - $users->currentPage() * $users->perPage() }}
+            <div class="mt-4">
+                {{ $users->links() }}
             </div>
         </div>
     </div>
