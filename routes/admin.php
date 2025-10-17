@@ -163,7 +163,7 @@ Route::get('/login', [AuthController::class, 'login'])->name('login');
 |--------------------------------------------------------------------------
 */
 Route::middleware('guest')->name('guest.')->group(function () {
-    Route::get('/', [HomeController::class, 'index'])->name('home');
+    Route::get('/home', [HomeController::class, 'index'])->name('home');
     Route::get('/about', [HomeController::class, 'about'])->name('about');
     Route::get('/contact', [HomeController::class, 'contact'])->name('contact');
     Route::get('/games/preview', [HomeController::class, 'gamePreview'])->name('games.preview');
