@@ -464,6 +464,104 @@
                 </a>
             </li>
         @endif
+
+        {{-- فقط للطفل --}}
+        @if (auth()->user()->role?->name === 'kid')
+            {{-- Education & Quizzes --}}
+            <li class="menu-header small text-uppercase">
+                <span class="menu-header-text">Education & Quizzes</span>
+            </li>
+            <li class="menu-item {{ request()->routeIs('admin.lessons.*') ? 'active' : '' }}">
+                <a href="{{ route('admin.lessons.index') }}" class="menu-link">
+                    <i class="menu-icon bx bx-book-open"></i>
+                    <div>Lessons</div>
+                </a>
+            </li>
+            <li class="menu-item {{ request()->routeIs('admin.quizzes.*') ? 'active' : '' }}">
+                <a href="{{ route('admin.quizzes.index') }}" class="menu-link">
+                    <i class="menu-icon bx bx-question-mark"></i>
+                    <div>Quizzes</div>
+                </a>
+            </li>
+            <li class="menu-item {{ request()->routeIs('admin.quiz-attempts.*') ? 'active' : '' }}">
+                <a href="{{ route('admin.quiz-attempts.index') }}" class="menu-link">
+                    <i class="menu-icon bx bx-task"></i>
+                    <div>My Attempts</div>
+                </a>
+            </li>
+
+            {{-- Store & Rewards --}}
+            <li class="menu-header small text-uppercase">
+                <span class="menu-header-text">Store & Rewards</span>
+            </li>
+            <li class="menu-item {{ request()->routeIs('admin.store-items.*') ? 'active' : '' }}">
+                <a href="{{ route('admin.store-items.index') }}" class="menu-link">
+                    <i class="menu-icon bx bx-store"></i>
+                    <div>Store</div>
+                </a>
+            </li>
+            <li class="menu-item {{ request()->routeIs('admin.purchases.*') ? 'active' : '' }}">
+                <a href="{{ route('admin.purchases.index') }}" class="menu-link">
+                    <i class="menu-icon bx bx-receipt"></i>
+                    <div>My Purchases</div>
+                </a>
+            </li>
+            <li class="menu-item {{ request()->routeIs('admin.rewards.*') ? 'active' : '' }}">
+                <a href="{{ route('admin.rewards.index') }}" class="menu-link">
+                    <i class="menu-icon bx bx-gift"></i>
+                    <div>Rewards</div>
+                </a>
+            </li>
+
+            {{-- Daily Goals --}}
+            <li class="menu-header small text-uppercase">
+                <span class="menu-header-text">Goals</span>
+            </li>
+            <li class="menu-item {{ request()->routeIs('admin.daily-goals.*') ? 'active' : '' }}">
+                <a href="{{ route('admin.daily-goals.index') }}" class="menu-link">
+                    <i class="menu-icon bx bx-target-lock"></i>
+                    <div>Daily Goals</div>
+                </a>
+            </li>
+
+            {{-- Profile --}}
+            {{-- <li class="menu-header small text-uppercase">
+                <span class="menu-header-text">Account</span>
+            </li>
+            <li class="menu-item {{ request()->routeIs('admin.profile') ? 'active' : '' }}">
+                <a href="{{ route('admin.profile') }}" class="menu-link">
+                    <i class="menu-icon bx bx-user"></i>
+                    <div>My Profile</div>
+                </a>
+            </li> --}}
+
+            {{-- Gamification --}}
+            <li class="menu-header small text-uppercase">
+                <span class="menu-header-text">Gamification</span>
+            </li>
+            <li class="menu-item {{ request()->routeIs('admin.achievements.*') ? 'active' : '' }}">
+                <a href="{{ route('admin.achievements.index') }}" class="menu-link">
+                    <i class="menu-icon bx bx-star"></i>
+                    <div>Achievements</div>
+                </a>
+            </li>
+            <li class="menu-item {{ request()->routeIs('admin.points-transactions.*') ? 'active' : '' }}">
+                <a href="{{ route('admin.points-transactions.index') }}" class="menu-link">
+                    <i class="menu-icon bx bx-line-chart"></i>
+                    <div>Points</div>
+                </a>
+            </li>
+
+            {{-- Notifications --}}
+            {{-- <li class="menu-item {{ request()->routeIs('admin.notifications.*') ? 'active' : '' }}">
+                <a href="{{ route('admin.notifications.index') }}" class="menu-link">
+                    <i class="menu-icon bx bx-bell"></i>
+                    <div>Notifications</div>
+                </a>
+            </li> --}}
+        @endif
+
+
     </ul>
 </aside>
 

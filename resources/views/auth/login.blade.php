@@ -2,7 +2,7 @@
 
 <html lang="en" class="layout-wide customizer-hide" dir="ltr" data-skin="default"
     data-assets-path="{{ asset('dashboard/assets/"
-                data-template="vertical-menu-template') }}"
+                    data-template="vertical-menu-template') }}"
     data-bs-theme="light">
 
 <head>
@@ -83,7 +83,7 @@
                                 aria-label="Close"></button>
                         </div>
                     @endif
-                    
+
                     <div class="card-body">
                         <!-- Logo -->
                         <div class="app-brand justify-content-center">
@@ -213,6 +213,12 @@
                                     Create New Account ?
                                 </a>
                             </div>
+                            <div class="text-center">
+                                <a href="{{ route('guest.home') }}"
+                                    class="d-flex align-items-center justify-content-center">
+                                    <i class="bx bx-log-in bx-sm me-2"></i>
+                                    Continue as Guest
+                                </a>
                         </form>
                     </div>
                 </div>

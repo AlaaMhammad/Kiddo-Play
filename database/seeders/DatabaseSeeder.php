@@ -22,6 +22,7 @@ class DatabaseSeeder extends Seeder
     {
         // --- Roles ---
         Role::firstOrCreate(['name' => 'admin'], ['lable' => 'Administrator']);
+        Role::firstOrCreate(['name' => 'kid'], ['lable' => 'Kid User']);
         $parentRole = Role::firstOrCreate(['name' => 'parent'], ['lable' => 'Parent User']);
 
         // --- Admin user ---

@@ -11,9 +11,12 @@
         <form action="{{ route('admin.kids.update', $kid->id) }}" method="POST">
             @csrf
             @method('PUT')
-
-            {{-- Parent --}}
-            <x-form.select name="parent_id" label="Parent" :options="$parents" :selected="$kid->user_id" required />
+            @if ($parents)
+                {{-- Parent --}}
+                <x-form.select name="parent_id" label="Parent" :options="$parents" :selected="$kid->user_id" required />
+            @else
+                <input type="hidden" name="parent_id" value="{{ $parentId }}">
+            @endif
 
             {{-- Display Name --}}
             <x-form.input name="display_name" label="Display Name" :value="$kid->display_name" />

@@ -54,6 +54,10 @@
                                     @endif
                                 </td>
                                 <td class="text-center">
+                                    <!-- زر عرض الحساب -->
+                                    <button class="btn btn-sm btn-secondary show-auth-btn" data-id="{{ $kid->id }}">
+                                        <i class="bx bx-user-circle"></i>
+                                    </button>
                                     <a href="{{ route('admin.kids.show', $kid->id) }}" class="btn btn-sm btn-info"><i
                                             class="bx bx-show"></i></a>
                                     <a href="{{ route('admin.kids.edit', $kid->id) }}" class="btn btn-sm btn-warning">
@@ -75,6 +79,28 @@
                         @endforelse
                     </tbody>
                 </table>
+
+                <!-- Modal for Kid Account -->
+                <div class="modal fade" id="kidAuthModal" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Kid Authentication Info</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <p><strong>Name:</strong> <span id="kidName"></span></p>
+                                <p><strong>Email:</strong> <span id="kidEmail"></span></p>
+                                <p><strong>Password:</strong> <span id="kidPassword"></span></p>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
             </div>
 
             <div class="mt-4">
@@ -82,4 +108,24 @@
             </div>
         </div>
     </div>
+
+    @section('js')
+        <script>
+            $(document).ready(function() {
+                $('.show-auth-btn').click(function() {
+                    let kidId = $(this).data('id');
+                    $.get('/admin/kids/' + kidId + '/show-auth', function(res) {
+                        if (res.success) {
+                            $('#kidName').text(res.kid_name);
+                            $('#kidEmail').text(res.email);
+                            $('#kidPassword').text(res.password);
+                            $('#kidAuthModal').modal('show');
+                        } else {
+                            alert(res.error);
+                        }
+                    });
+                });
+            });
+        </script>
+    @endsection
 </x-admin>

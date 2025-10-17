@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
-class CheckParent
+class isKid
 {
     /**
      * Handle an incoming request.
@@ -21,7 +21,7 @@ class CheckParent
             abort(403, 'User not logged in');
         }
 
-        if ($user->role?->name === 'parent' || $user->role?->name === 'admin') {
+        if ($user->role?->name === 'kid' || $user->role?->name === 'parent' || $user->role?->name === 'admin') {
             return $next($request);
         }
 

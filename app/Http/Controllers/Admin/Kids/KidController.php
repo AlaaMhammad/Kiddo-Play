@@ -10,6 +10,8 @@ use App\Models\User;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 class KidController extends Controller
 {
@@ -18,7 +20,7 @@ class KidController extends Controller
      */
     public function index()
     {
-       /** @var \App\Models\User $user */
+        /** @var \App\Models\User $user */
         $user = Auth::user();
 
         if ($user->role->name === 'admin') {
@@ -40,15 +42,26 @@ class KidController extends Controller
      */
     public function create()
     {
-        // قائمة الآباء: id => name
-        $parents = User::whereHas('role', fn($q) => $q->where('name', 'parent'))
-            ->pluck('name', 'id');
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        // إذا كان الدور Parent، لا نعرض قائمة، فقط نمرر الأب الحالي
+        if ($user->role->name === 'parent') {
+            $parentId = $user->id;
+            $parents = null; // لا حاجة للقائمة
+        } else {
+            // إذا كان أدمين، نعرض قائمة الآباء
+            $parents = User::whereHas('role', fn($q) => $q->where('name', 'parent'))
+                ->pluck('name', 'id');
+            $parentId = null;
+        }
 
         $avatars = Avatar::where('is_active', true)
             ->pluck('name', 'id');
 
-        return view('admin.kids.create', compact('parents', 'avatars'));
+        return view('admin.kids.create', compact('parents', 'avatars', 'parentId'));
     }
+
 
     /**
      * Store a newly created resource in storage.
@@ -108,14 +121,25 @@ class KidController extends Controller
      */
     public function edit(Kid $kid)
     {
-        // نحولها مباشرة إلى مصفوفة [id => name]
-        $parents = User::whereHas('role', fn($q) => $q->where('name', 'parent'))
-            ->pluck('name', 'id')->toArray();
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        // إذا كان الدور Parent، لا نعرض قائمة، فقط نمرر الأب الحالي
+        if ($user->role->name === 'parent') {
+            $parentId = $user->id;
+            $parents = null; // لا حاجة للقائمة
+        } else {
+            // إذا كان أدمين، نعرض قائمة الآباء
+            $parents = User::whereHas('role', fn($q) => $q->where('name', 'parent'))
+                ->pluck('name', 'id')->toArray();
+            $parentId = null;
+        }
 
         $avatars = Avatar::where('is_active', true)->pluck('name', 'id')->toArray();
 
-        return view('admin.kids.edit', compact('kid', 'parents', 'avatars'));
+        return view('admin.kids.edit', compact('kid', 'parents', 'avatars', 'parentId'));
     }
+
 
     /**
      * Update the specified resource in storage.
@@ -164,5 +188,22 @@ class KidController extends Controller
         return redirect()
             ->route('admin.kids.index')
             ->with('success', 'Kid deleted successfully.');
+    }
+
+
+
+    public function showKidAuth(Kid $kid)
+    {
+        $user = $kid->user;
+        if (!$user) {
+            return response()->json(['error' => 'No user linked to this kid.'], 404);
+        }
+
+        return response()->json([
+            'success' => true,
+            'kid_name' => $kid->display_name,
+            'email' => $user->email,
+            'password' => $user->plain_password ?? 'N/A', // كلمة المرور المخزنة مؤقتًا
+        ]);
     }
 }

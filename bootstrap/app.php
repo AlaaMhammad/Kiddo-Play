@@ -4,6 +4,7 @@ use App\Http\Middleware\CheckParent;
 use App\Http\Middleware\CheckRole;
 use App\Http\Middleware\IsAdmin;
 use App\Http\Middleware\isAuth;
+use App\Http\Middleware\isKid;
 use App\Http\Middleware\Localization;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -19,9 +20,10 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
             'isAuth' => isAuth::class,
-            // 'Admin' => IsAdmin::class,
+            'isAdmin' => IsAdmin::class,
             'role' => CheckRole::class,
-            // 'parent' => CheckParent::class,
+            'isParent' => CheckParent::class,
+            'isKid' => isKid::class,
         ]);
         $middleware->appendToGroup('web', Localization::class);
     })

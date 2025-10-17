@@ -44,20 +44,17 @@ class AuthController extends Controller
             //     Auth::logout();
             //     return redirect()->back()->withErrors(['errorlogin' => 'يرجى التحقق من بريدك الإلكتروني لتفعيل الحساب.']);
             // }
-            $role = $user->role->name;
+            $role = $user->role?->name;
             $request->session()->regenerate();
             if ($role === 'admin') {
                 return to_route('admin.index');
                 // dd($role);
+            } elseif ($role === 'parent') {
+                return redirect()->route('admin.index'); // لوحة تحكم المحاسب
+            } elseif ($role === 'kid') {
+                return redirect()->route('admin.index'); // لوحة تحكم المحاسب
+
             }
-            //  elseif ($role === 'employee') {
-            //     if ($roleName === 'accountant') {
-            //         return redirect()->route('admin.index'); // لوحة تحكم المحاسب
-            //     }
-            //     return redirect()->route('admin.index'); // لوحة تحكم الموظف
-            // } elseif ($role === 'client') {
-            //     return redirect()->route('login');
-            // }
         }
 
         return redirect()->route('admin.index');
@@ -76,10 +73,13 @@ class AuthController extends Controller
             'children.*.name' => 'required|string|max:255',
             'children.*.dob' => 'required|date',
             'children.*.gender' => 'required|in:male,female,other',
+            'children.*.email' => 'required|email|distinct|unique:users,email',
+            'children.*.password' => 'required|confirmed|min:6', // children[*][password_confirmation]
         ]);
 
-        // Get parent role id
+        // Get role ids
         $parentRoleId = DB::table('roles')->where('name', 'parent')->value('id');
+        $kidRoleId = DB::table('roles')->where('name', 'kid')->value('id'); // افترض وجود دور للأطفال
 
         // Create Parent User
         $parent = User::create([
@@ -89,12 +89,21 @@ class AuthController extends Controller
             'role_id' => $parentRoleId,
         ]);
 
-        // Create Children
+        // Create Children Users and Kids records
         if ($request->has('children')) {
             foreach ($request->children as $child) {
-                // Create Child using Eloquent
+                // Create Child User
+                $childUser = User::create([
+                    'name' => $child['name'],
+                    'email' => $child['email'],
+                    'password' => Hash::make($child['password']),
+                    'plain_password' => $child['password'],
+                    'role_id' => $kidRoleId,
+                ]);
+
+                // Create Child info in kids table
                 $kid = Kid::create([
-                    'user_id' => $parent->id, // إذا كنت تستخدم جدول parent_children فلا تحتاجه هنا
+                    'user_id' => $childUser->id,
                     'display_name' => $child['name'],
                     'dob' => $child['dob'],
                     'gender' => $child['gender'],
@@ -107,13 +116,10 @@ class AuthController extends Controller
                 $parent->children()->attach($kid->id);
             }
         }
-
-
-        // return redirect()->route('login')->with('verify', 'تم تسجيل الحساب بنجاح وتم ارسال رابط التفعيل عبر الايميل');
-        return redirect()->route('login')->with([
-            'success' => 'Account and children created successfully! Please log in.'
-        ]);
+        flash()->success('Parent and children accounts created successfully.');
+        return redirect()->route('login');
     }
+
 
 
 

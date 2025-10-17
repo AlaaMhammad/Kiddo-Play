@@ -46,6 +46,7 @@ class UserController extends Controller
             'name'       => $request->name,
             'email'      => $request->email,
             'password'   => Hash::make($request->password),
+            'plain_password' => $request->password,
             'role_id'    => $request->role_id,
             'is_active'  => $request->boolean('is_active'),
         ]);

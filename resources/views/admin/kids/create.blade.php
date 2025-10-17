@@ -1,5 +1,5 @@
 <x-admin title="Add New Kid">
-    
+
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h4 class="fw-bold mb-0">Add New kid</h4>
         <div class="mb-4">
@@ -10,9 +10,11 @@
     <div class="card p-4">
         <form action="{{ route('admin.kids.store') }}" method="POST">
             @csrf
-
-            <x-form.select name="parent_id" label="Parent" :options="$parents" required />
-
+            @if ($parents)
+                <x-form.select name="parent_id" label="Parent" :options="$parents" required />
+            @else
+                <input type="hidden" name="parent_id" value="{{ $parentId }}">
+            @endif
             <x-form.input name="display_name" label="Display Name" />
 
             <x-form.date name="dob" label="Date of Birth" />
