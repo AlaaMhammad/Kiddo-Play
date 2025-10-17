@@ -2,7 +2,7 @@
 
 <html lang="en" class="layout-wide customizer-hide" dir="ltr" data-skin="default"
     data-assets-path="{{ asset('dashboard/assets/"
-                    data-template="vertical-menu-template') }}"
+                            data-template="vertical-menu-template') }}"
     data-bs-theme="light">
 
 <head>
@@ -57,6 +57,37 @@
     <!--? Config:  Mandatory theme config file contain global vars & default theme options, Set your preferred theme option in this file.  -->
 
     <script src="{{ asset('dashboard/assets/js/config.js') }}"></script>
+
+
+    <style>
+        .btn-register {
+            background: linear-gradient(135deg, #3a86ff, #8338ec);
+            color: #fff;
+            font-weight: 600;
+            border-radius: 16px;
+            box-shadow: 0 6px 15px rgba(58, 134, 255, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        .btn-register:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(58, 134, 255, 0.6);
+        }
+
+        .btn-guest {
+            background: linear-gradient(135deg, #ffbe0b, #fb5607);
+            color: #fff;
+            font-weight: 600;
+            border-radius: 16px;
+            box-shadow: 0 6px 15px rgba(255, 190, 11, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        .btn-guest:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(255, 190, 11, 0.6);
+        }
+    </style>
 </head>
 
 <body>
@@ -206,19 +237,19 @@
                                 <button class="btn btn-primary d-grid w-100">Login</button>
                             </div>
 
-                            <div class="text-center">
+                            <div class="d-flex flex-row gap-3 mt-4 justify-content-center flex-wrap">
                                 <a href="{{ route('register') }}"
-                                    class="d-flex align-items-center justify-content-center">
-                                    <i class="bx bx-user-plus bx-sm me-2"></i>
-                                    Create New Account ?
+                                    class="btn btn-register d-flex align-items-center justify-content-center px-4 py-3">
+                                    <i class="bx bx-user-plus bx-lg me-2"></i>
+                                    Create New Account
                                 </a>
-                            </div>
-                            <div class="text-center">
+
                                 <a href="{{ route('guest.home') }}"
-                                    class="d-flex align-items-center justify-content-center">
-                                    <i class="bx bx-log-in bx-sm me-2"></i>
+                                    class="btn btn-guest d-flex align-items-center justify-content-center px-4 py-3">
+                                    <i class="bx bx-log-in bx-lg me-2"></i>
                                     Continue as Guest
                                 </a>
+                            </div>
                         </form>
                     </div>
                 </div>
