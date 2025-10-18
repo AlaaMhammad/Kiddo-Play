@@ -5,31 +5,40 @@ namespace App\Http\Controllers\Admin\Store;
 use App\Http\Controllers\Controller;
 use App\Models\StoreItem;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class StoreItemController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        $items = StoreItem::latest()->paginate(10);
+        $user = Auth::user();
+
+        if ($user->role->name === 'admin') {
+            $items = StoreItem::latest()->paginate(10);
+        } else {
+            // الوالد أو الطفل يرون فقط العناصر النشطة
+            $items = StoreItem::where('is_active', true)->latest()->paginate(10);
+        }
+
         return view('admin.Store.store-items.index', compact('items'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
+    public function show(StoreItem $store_item)
+    {
+        $this->checkAccess($store_item);
+        return view('admin.Store.store-items.show', compact('store_item'));
+    }
+
     public function create()
     {
+        $this->authorizeRole('admin');
         return view('admin.Store.store-items.create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
+        $this->authorizeRole('admin');
+
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
@@ -38,37 +47,27 @@ class StoreItemController extends Controller
             'metadata' => 'nullable|string',
             'is_active' => 'boolean',
         ]);
-        // تحويل النص إلى JSON صالح إذا تم إدخاله
+
         if (!empty($validated['metadata'])) {
             $validated['metadata'] = json_encode($validated['metadata']);
         }
+
         StoreItem::create($validated);
 
         return redirect()->route('admin.store-items.index')
             ->with('success', 'Store item created successfully.');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(StoreItem $store_item)
-    {
-        return view('admin.Store.store-items.show', compact('store_item'));
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(StoreItem $store_item)
     {
+        $this->authorizeRole('admin');
         return view('admin.Store.store-items.edit', compact('store_item'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, StoreItem $store_item)
     {
+        $this->authorizeRole('admin');
+
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
@@ -88,14 +87,28 @@ class StoreItemController extends Controller
             ->with('success', 'Store item updated successfully.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(StoreItem $store_item)
     {
+        $this->authorizeRole('admin');
         $store_item->delete();
 
         return redirect()->route('admin.store-items.index')
             ->with('success', 'Store item deleted successfully.');
+    }
+
+    private function checkAccess(StoreItem $store_item)
+    {
+        $user = Auth::user();
+
+        if ($user->role->name === 'admin') return;
+
+        // الآباء والأطفال يمكنهم فقط رؤية العناصر النشطة
+        abort_unless($store_item->is_active, 403, 'Unauthorized access');
+    }
+
+    private function authorizeRole($role)
+    {
+        $user = Auth::user();
+        abort_unless($user && $user->role->name === $role, 403, 'Unauthorized action.');
     }
 }

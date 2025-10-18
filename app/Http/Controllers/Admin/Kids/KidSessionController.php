@@ -6,23 +6,51 @@ use App\Http\Controllers\Controller;
 use App\Models\Kid;
 use App\Models\KidSession;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class KidSessionController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        $sessions = KidSession::with('kid')->latest()->paginate(10);
+        $user = Auth::user();
+
+        if ($user->role->name === 'admin') {
+            $sessions = KidSession::with('kid')->latest()->paginate(10);
+        } elseif (in_array($user->role->name, ['parent', 'kid'])) {
+            $kidId = $user->kid?->id;
+            $sessions = KidSession::with('kid')
+                ->where('kid_id', $kidId)
+                ->latest()
+                ->paginate(10);
+        } else {
+            abort(403, 'Unauthorized');
+        }
+
         return view('admin.kid-sessions.index', compact('sessions'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
+    public function show(KidSession $kidSession)
+    {
+        $user = Auth::user();
+        $kidSession->load('kid');
+
+        if ($user->role->name === 'admin') {
+            return view('admin.kid-sessions.show', compact('kidSession'));
+        }
+
+        if (in_array($user->role->name, ['parent', 'kid'])) {
+            $kidId = $user->kid?->id;
+            abort_unless($kidSession->kid_id === $kidId, 403, 'You do not have access to this session.');
+            return view('admin.kid-sessions.show', compact('kidSession'));
+        }
+
+        abort(403, 'Unauthorized');
+    }
+
+    // الأدمن فقط يستطيع إنشاء
     public function create()
     {
+        $this->authorizeRole('admin');
         $kids = Kid::all()->map(fn($kid) => [
             'id' => $kid->id,
             'display_name' => $kid->display_name
@@ -31,11 +59,10 @@ class KidSessionController extends Controller
         return view('admin.kid-sessions.create', compact('kids'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
+        $this->authorizeRole('admin');
+
         $validated = $request->validate([
             'kid_id' => 'required|exists:kids,id',
             'started_at' => 'nullable|date',
@@ -50,22 +77,11 @@ class KidSessionController extends Controller
             ->with('success', 'Kid session created successfully.');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(KidSession $kidSession)
-    {
-        // تحميل العلاقة مع الطفل (Kid)
-        $kidSession->load('kid');
-
-        return view('admin.kid-sessions.show', compact('kidSession'));
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
+    // الأدمن فقط يستطيع تعديل
     public function edit(KidSession $kidSession)
     {
+        $this->authorizeRole('admin');
+
         $kids = Kid::all()->map(fn($kid) => [
             'id' => $kid->id,
             'display_name' => $kid->display_name
@@ -74,11 +90,10 @@ class KidSessionController extends Controller
         return view('admin.kid-sessions.edit', compact('kidSession', 'kids'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, KidSession $kidSession)
     {
+        $this->authorizeRole('admin');
+
         $validated = $request->validate([
             'kid_id' => 'required|exists:kids,id',
             'started_at' => 'nullable|date',
@@ -93,14 +108,21 @@ class KidSessionController extends Controller
             ->with('success', 'Kid session updated successfully.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
+    // الأدمن فقط يستطيع حذف
     public function destroy(KidSession $kidSession)
     {
+        $this->authorizeRole('admin');
+
         $kidSession->delete();
 
         return redirect()->route('admin.kid-sessions.index')
             ->with('success', 'Kid session deleted successfully.');
+    }
+
+    // دالة مساعدة لفحص الدور
+    private function authorizeRole($role)
+    {
+        $user = Auth::user();
+        abort_unless($user && $user->role->name === $role, 403, 'Unauthorized action.');
     }
 }

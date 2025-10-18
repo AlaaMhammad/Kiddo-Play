@@ -12,7 +12,7 @@ class Game extends Model
 
     public function kids()
     {
-        return $this->belongsToMany(Kid::class, 'game_kid')
+        return $this->belongsToMany(Kid::class, 'game_kids', 'game_id', 'kid_id')
             ->withPivot(['score', 'play_count', 'last_played_at'])
             ->withTimestamps();
     }

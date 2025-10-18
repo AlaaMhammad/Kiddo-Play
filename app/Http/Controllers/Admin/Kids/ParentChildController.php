@@ -11,31 +11,28 @@ use Illuminate\Support\Facades\Auth;
 
 class ParentChildController extends Controller
 {
+    private function authorizeRole($role)
+    {
+        /** @var User $user */
+        $user = Auth::user();
+        abort_unless($user && $user->role->name === $role, 403, 'Unauthorized action.');
+    }
+
     public function index()
     {
-        /** @var \App\Models\User $user */
-        $user = Auth::user();
+        $this->authorizeRole('admin');
 
-        if ($user->role->name === 'admin') {
-            // Admin يشوف كل الآباء والأطفال المرتبطين
-            $parentChildren = ParentChild::with(['parent', 'kid'])->latest()->paginate(10);
-        } else {
-            abort(403, 'Unauthorized');
-        }
-
+        $parentChildren = ParentChild::with(['parent', 'kid'])->latest()->paginate(10);
         return view('admin.parent-children.index', compact('parentChildren'));
     }
 
     public function create()
     {
-        // جلب الآباء فقط عبر العلاقة role
-        $parents = User::whereHas('role', function ($q) {
-            $q->where('name', 'parent');
-        })->pluck('name', 'id');
+        $this->authorizeRole('admin');
 
+        $parents = User::whereHas('role', fn($q) => $q->where('name', 'parent'))->pluck('name', 'id');
         $kids = Kid::pluck('display_name', 'id');
 
-        // لو مافيه بيانات، نرجع تنبيه جميل بدل الخطأ
         if ($parents->isEmpty() || $kids->isEmpty()) {
             return redirect()->route('admin.parent-children.index')
                 ->with('warning', 'Please make sure there are both Parents and Kids before linking.');
@@ -46,6 +43,8 @@ class ParentChildController extends Controller
 
     public function store(Request $request)
     {
+        $this->authorizeRole('admin');
+
         $data = $request->validate([
             'parent_id' => 'required|exists:users,id',
             'kid_id'    => 'required|exists:kids,id',
@@ -58,16 +57,17 @@ class ParentChildController extends Controller
 
     public function show(ParentChild $parentChild)
     {
+        $this->authorizeRole('admin');
+
         $parentChild->load(['parent', 'kid']);
         return view('admin.parent-children.show', compact('parentChild'));
     }
 
     public function edit(ParentChild $parentChild)
     {
-        $parents = User::whereHas('role', function ($q) {
-            $q->where('name', 'parent');
-        })->pluck('name', 'id');
+        $this->authorizeRole('admin');
 
+        $parents = User::whereHas('role', fn($q) => $q->where('name', 'parent'))->pluck('name', 'id');
         $kids = Kid::pluck('display_name', 'id');
 
         return view('admin.parent-children.edit', compact('parentChild', 'parents', 'kids'));
@@ -75,6 +75,8 @@ class ParentChildController extends Controller
 
     public function update(Request $request, ParentChild $parentChild)
     {
+        $this->authorizeRole('admin');
+
         $data = $request->validate([
             'parent_id' => 'required|exists:users,id',
             'kid_id'    => 'required|exists:kids,id',
@@ -87,6 +89,8 @@ class ParentChildController extends Controller
 
     public function destroy(ParentChild $parentChild)
     {
+        $this->authorizeRole('admin');
+
         $parentChild->delete();
         return redirect()->route('admin.parent-children.index')->with('success', 'Relation deleted successfully');
     }

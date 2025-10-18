@@ -10,27 +10,31 @@ class KidPolicy
 {
     public function viewAny(User $user): bool
     {
+        // يمكن للأب رؤية أطفاله
         return $user->role?->name === 'parent';
     }
 
-
     public function view(User $user, Kid $kid): bool
     {
-        return $user->role->name === 'parent' && $kid->parents->contains($user->id);
+        // الأب يمكنه رؤية أي طفل مرتبط به
+        return $kid->parents->contains($user->id);
     }
 
     public function update(User $user, Kid $kid): bool
     {
-        return $user->role->name === 'parent' && $kid->parents->contains($user->id);
+        // الأب يمكنه تعديل أي طفل مرتبط به
+        return $kid->parents->contains($user->id);
     }
 
     public function create(User $user): bool
     {
-        return false;
+        return $user->role?->name === 'parent';
     }
+
 
     public function delete(User $user, Kid $kid): bool
     {
-        return false;
+        // الأب يمكنه حذف الطفل المرتبط به
+        return $kid->parents->contains($user->id);
     }
 }

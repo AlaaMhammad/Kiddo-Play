@@ -10,25 +10,25 @@ use App\Models\User;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
 class KidController extends Controller
 {
+    use AuthorizesRequests;
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        /** @var \App\Models\User $user */
+        /** @var User $user */
         $user = Auth::user();
 
         if ($user->role->name === 'admin') {
-            // Admin يشوف كل الأطفال
-            $kids = Kid::with(['user', 'avatar'])->latest()->paginate(10);
-        } else if ($user->role->name === 'parent') {
-            // Parent يشوف أطفال الخاصة فيه فقط
-            $kids = $user->children()->paginate(10);
+            $kids = Kid::with(['parents', 'user', 'avatar'])->latest()->paginate(10);
+        } elseif ($user->role->name === 'parent') {
+            $kids = $user->children()->with(['parents', 'user', 'avatar'])->paginate(10);
         } else {
             abort(403, 'Unauthorized');
         }
@@ -36,116 +36,121 @@ class KidController extends Controller
         return view('admin.kids.index', compact('kids'));
     }
 
-
     /**
-     * Show the form for creating a new resource.
+     * إظهار نموذج إنشاء طفل جديد.
      */
     public function create()
     {
+        $this->authorize('create', Kid::class);
+
         /** @var \App\Models\User $user */
         $user = Auth::user();
 
-        // إذا كان الدور Parent، لا نعرض قائمة، فقط نمرر الأب الحالي
         if ($user->role->name === 'parent') {
+            // الأب الحالي هو الـ parentId، لا نعرض قائمة اختيار
             $parentId = $user->id;
-            $parents = null; // لا حاجة للقائمة
+            $parents = null;
         } else {
-            // إذا كان أدمين، نعرض قائمة الآباء
+            // الأدمن يرى قائمة الآباء
             $parents = User::whereHas('role', fn($q) => $q->where('name', 'parent'))
                 ->pluck('name', 'id');
             $parentId = null;
         }
 
-        $avatars = Avatar::where('is_active', true)
-            ->pluck('name', 'id');
+        $avatars = Avatar::where('is_active', true)->pluck('name', 'id');
 
         return view('admin.kids.create', compact('parents', 'avatars', 'parentId'));
     }
 
-
     /**
-     * Store a newly created resource in storage.
+     * تخزين الطفل وحسابه.
      */
     public function store(Request $request)
     {
+        $this->authorize('create', Kid::class);
+
         $validated = $request->validate([
-            'parent_id' => 'nullable|exists:users,id',
-            'display_name' => 'nullable|string|max:255',
+            'display_name' => 'required|string|max:255',
             'dob' => 'nullable|date',
             'gender' => 'nullable|in:male,female,other',
             'avatar_id' => 'nullable|exists:avatars,id',
             'points' => 'nullable|integer|min:0',
+            'parent_id' => 'nullable|exists:users,id',
+            'email' => 'required|email|unique:users,email',
+            'password' => 'required|confirmed|min:6',
         ]);
 
-        // إذا تم اختيار أب، استخدمه في user_id
-        $userId = $validated['parent_id'] ?? null;
+        // إنشاء حساب الطفل
+        $kidUser = User::create([
+            'name' => $validated['display_name'],
+            'email' => $validated['email'],
+            'password' => Hash::make($validated['password']),
+            'plain_password' => $validated['password'],
+            'role_id' => DB::table('roles')->where('name', 'kid')->value('id'),
+        ]);
 
+        // إنشاء سجل الطفل
         $kid = Kid::create([
-            'display_name' => $validated['display_name'] ?? null,
+            'display_name' => $validated['display_name'],
             'dob' => $validated['dob'] ?? null,
             'gender' => $validated['gender'] ?? null,
             'avatar_id' => $validated['avatar_id'] ?? null,
             'points' => $validated['points'] ?? 0,
-            'user_id' => $userId, // هذا هو التغيير المهم
+            'user_id' => $kidUser->id, // رابط لحساب الطفل نفسه
         ]);
 
-        // لو فيه أب إضافي غير user_id (علاقات Many-to-Many مع ParentChild)
+        // ربط الطفل بالوالد (علاقة Many-to-Many)
         if (!empty($validated['parent_id'])) {
             $kid->parents()->attach($validated['parent_id']);
         }
 
-        return redirect()->route('admin.kids.index')
-            ->with('success', 'Kid created successfully!');
+        flash()->success('Kid and account created successfully!');
+        return redirect()->route('admin.kids.index');
     }
 
     /**
-     * Display the specified resource.
+     * عرض تفاصيل الطفل.
      */
     public function show(Kid $kid)
     {
-        $kid->load([
-            'avatar',
-            'achievements.achievement',
-            'lessonProgress.lesson',
-            'sessions',
-            'dailyGoals',
-            'pointsTransactions',
-            'parents', // من جدول parent_children
-        ]);
-
+        $this->authorize('create', $kid);
+        $kid->load(['avatar', 'parents', 'user']);
         return view('admin.kids.show', compact('kid'));
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * إظهار نموذج تعديل الطفل.
      */
     public function edit(Kid $kid)
     {
-        /** @var \App\Models\User $user */
+        $this->authorize('update', $kid);
+
+        /** @var User $user */
         $user = Auth::user();
 
-        // إذا كان الدور Parent، لا نعرض قائمة، فقط نمرر الأب الحالي
         if ($user->role->name === 'parent') {
+            // الأب الحالي مرتبط بالطفل
             $parentId = $user->id;
-            $parents = null; // لا حاجة للقائمة
+            $parents = null; // لا نعرض قائمة اختيار الأب
         } else {
-            // إذا كان أدمين، نعرض قائمة الآباء
+            // الأدمن يرى قائمة اختيار الأب
             $parents = User::whereHas('role', fn($q) => $q->where('name', 'parent'))
-                ->pluck('name', 'id')->toArray();
-            $parentId = null;
+                ->pluck('name', 'id');
+            $parentId = null; // الأب غير معروف بشكل مباشر
         }
 
-        $avatars = Avatar::where('is_active', true)->pluck('name', 'id')->toArray();
+        $avatars = Avatar::where('is_active', true)->pluck('name', 'id');
 
         return view('admin.kids.edit', compact('kid', 'parents', 'avatars', 'parentId'));
     }
 
 
     /**
-     * Update the specified resource in storage.
+     * تحديث الطفل وحسابه.
      */
     public function update(Request $request, Kid $kid)
     {
+        $this->authorize('update', $kid);
         $validated = $request->validate([
             'display_name' => 'nullable|string|max:255',
             'dob' => 'nullable|date',
@@ -154,42 +159,53 @@ class KidController extends Controller
             'points' => 'nullable|integer|min:0',
             'preferences' => 'nullable|json',
             'parent_id' => 'nullable|exists:users,id',
+            'email' => 'nullable|email|unique:users,email,' . $kid->user_id,
+            'password' => 'nullable|confirmed|min:6',
         ]);
 
-        // تحديث العلاقة مع الأهل
-        if (!empty($validated['parent_id'])) {
-            // تحديث أو إنشاء العلاقة في جدول parent_children
-            ParentChild::updateOrCreate(
-                ['kid_id' => $kid->id],
-                ['parent_id' => $validated['parent_id']]
-            );
+        // تحديث بيانات الطفل (بدون email و password)
+        $kid->update(collect($validated)->except(['parent_id', 'email', 'password'])->toArray());
 
-            // تحديث user_id في جدول kids ليكون نفس الأب (اختياري)
-            $validated['user_id'] = $validated['parent_id'];
+        // تحديث حساب الطفل
+        if ($kid->user) {
+            $kid->user->update([
+                'name' => $validated['display_name'] ?? $kid->user->name,
+                'email' => $validated['email'] ?? $kid->user->email,
+                'password' => !empty($validated['password']) ? Hash::make($validated['password']) : $kid->user->password,
+                'plain_password' => !empty($validated['password']) ? $validated['password'] : $kid->user->plain_password,
+            ]);
         }
 
-        // لا ترسل parent_id إلى جدول kids لأنه غير موجود هناك
-        $kid->update(collect($validated)->except('parent_id')->toArray());
+        // تحديث علاقة الأب فقط
+        if (!empty($validated['parent_id'])) {
+            $kid->parents()->sync([$validated['parent_id']]); // يربط الأب الجديد فقط
+        }
 
-        return redirect()
-            ->route('admin.kids.index')
-            ->with('success', 'Kid updated successfully and parent linked.');
+        flash()->success('Kid and account updated successfully!');
+        return redirect()->route('admin.kids.index');
     }
 
     /**
-     * Remove the specified resource from storage.
+     * حذف الطفل وحسابه فقط.
      */
     public function destroy(Kid $kid)
     {
-        // حذف العلاقات أولاً
-        ParentChild::where('kid_id', $kid->id)->delete();
+        $this->authorize('delete', $kid);
+
+        // فصل علاقات الأب
+        $kid->parents()->detach();
+
+        // حذف حساب الطفل
+        if ($kid->user) {
+            $kid->user->delete();
+        }
+
+        // حذف سجل الطفل
         $kid->delete();
 
-        return redirect()
-            ->route('admin.kids.index')
-            ->with('success', 'Kid deleted successfully.');
+        flash()->success('Kid and account deleted successfully!');
+        return redirect()->route('admin.kids.index');
     }
-
 
 
     public function showKidAuth(Kid $kid)

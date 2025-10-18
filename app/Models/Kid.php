@@ -60,6 +60,13 @@ class Kid extends Model
         return $this->belongsToMany(User::class, 'parent_children', 'kid_id', 'parent_id');
     }
 
+    public function games()
+    {
+        return $this->belongsToMany(\App\Models\Game::class, 'game_kids', 'kid_id', 'game_id')
+            ->withPivot(['score', 'play_count', 'last_played_at'])
+            ->withTimestamps();
+    }
+
     public function parentalControls()
     {
         return $this->hasMany(ParentalControl::class);

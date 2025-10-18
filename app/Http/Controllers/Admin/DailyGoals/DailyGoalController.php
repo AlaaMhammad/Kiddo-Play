@@ -3,51 +3,68 @@
 namespace App\Http\Controllers\Admin\DailyGoals;
 
 use App\Http\Controllers\Controller;
-use App\Models\Avatar;
 use App\Models\DailyGoal;
 use App\Models\Kid;
 use App\Models\Game;
-use App\Models\Role;
 use App\Models\User;
+use App\Models\Avatar;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class DailyGoalController extends Controller
 {
     public function index()
     {
-        $dailyGoals = DailyGoal::with(['kid', 'game'])->orderBy('goal_date', 'desc')->latest()->paginate(10);
+        /**  @var User $user */
+        $user = Auth::user();
+
+        if ($user->role->name === 'admin') {
+            $dailyGoals = DailyGoal::with(['kid', 'game'])->orderBy('goal_date', 'desc')->latest()->paginate(10);
+        } elseif ($user->role->name === 'parent') {
+            $kidsIds = $user->children()->pluck('kids.id'); // علاقة parent → children
+            $dailyGoals = DailyGoal::with(['kid', 'game'])
+                ->whereIn('kid_id', $kidsIds)
+                ->orderBy('goal_date', 'desc')
+                ->latest()
+                ->paginate(10);
+        } elseif ($user->role->name === 'kid') {
+            $kidId = $user->kid?->id;
+            $dailyGoals = DailyGoal::with(['kid', 'game'])
+                ->where('kid_id', $kidId)
+                ->orderBy('goal_date', 'desc')
+                ->latest()
+                ->paginate(10);
+        } else {
+            abort(403, 'Unauthorized');
+        }
+
         return view('admin.daily-goals.index', compact('dailyGoals'));
     }
 
+    public function show(DailyGoal $dailyGoal)
+    {
+        $this->checkAccess($dailyGoal);
+        return view('admin.daily-goals.show', compact('dailyGoal'));
+    }
+
+    // الأدمن فقط يستطيع إنشاء
     public function create()
     {
-        $kids = Kid::all()->map(fn($kid) => [
-            'id' => $kid->id,
-            'name' => $kid->display_name,
-        ])->toArray();
+        $this->authorizeRole('admin');
 
-        $games = Game::all()->map(fn($game) => [
-            'id' => $game->id,
-            'name' => $game->description, // أو أي حقل يمثل اسم اللعبة
-        ])->toArray();
-
-        $parents = User::whereHas('role', fn($q) => $q->where('name', 'parent'))
-            ->get()
-            ->map(fn($user) => [
-                'id' => $user->id,
-                'name' => $user->name
-            ])->toArray();
-
-        $avatars = Avatar::all()->map(fn($avatar) => [
-            'id' => $avatar->id,
-            'name' => $avatar->name, // أو أي حقل يوضح الصورة/الاسم
-        ])->toArray();
+        $kids = Kid::all()->map(fn($kid) => ['id' => $kid->id, 'name' => $kid->display_name])->toArray();
+        $games = Game::all()->map(fn($game) => ['id' => $game->id, 'name' => $game->description])->toArray();
+        $parents = User::whereHas('role', fn($q) => $q->where('name', 'parent'))->get()
+            ->map(fn($user) => ['id' => $user->id, 'name' => $user->name])->toArray();
+        $avatars = Avatar::all()->map(fn($avatar) => ['id' => $avatar->id, 'name' => $avatar->name])->toArray();
 
         return view('admin.daily-goals.create', compact('kids', 'games', 'parents', 'avatars'));
     }
 
     public function store(Request $request)
     {
+        $this->authorizeRole('admin');
+
         $data = $request->validate([
             'kid_id' => 'required|exists:kids,id',
             'game_id' => 'nullable|exists:games,id',
@@ -64,24 +81,21 @@ class DailyGoalController extends Controller
         return redirect()->route('admin.daily-goals.index')->with('success', 'Daily Goal created successfully.');
     }
 
+    // الأدمن فقط يستطيع تعديل
     public function edit(DailyGoal $dailyGoal)
     {
-        $kids = Kid::all()->map(fn($kid) => [
-            'id' => $kid->id,
-            'name' => $kid->display_name,
-        ])->toArray();
+        $this->authorizeRole('admin');
 
-        $games = Game::all()->map(fn($game) => [
-            'id' => $game->id,
-            'name' => $game->description, // أو أي حقل يمثل اسم اللعبة
-        ])->toArray();
+        $kids = Kid::all()->map(fn($kid) => ['id' => $kid->id, 'name' => $kid->display_name])->toArray();
+        $games = Game::all()->map(fn($game) => ['id' => $game->id, 'name' => $game->description])->toArray();
 
         return view('admin.daily-goals.edit', compact('dailyGoal', 'kids', 'games'));
     }
 
-
     public function update(Request $request, DailyGoal $dailyGoal)
     {
+        $this->authorizeRole('admin');
+
         $data = $request->validate([
             'kid_id' => 'required|exists:kids,id',
             'game_id' => 'nullable|exists:games,id',
@@ -98,14 +112,38 @@ class DailyGoalController extends Controller
         return redirect()->route('admin.daily-goals.index')->with('success', 'Daily Goal updated successfully.');
     }
 
-    public function show(DailyGoal $dailyGoal)
-    {
-        return view('admin.daily-goals.show', compact('dailyGoal'));
-    }
-
     public function destroy(DailyGoal $dailyGoal)
     {
+        $this->authorizeRole('admin');
+
         $dailyGoal->delete();
         return redirect()->route('admin.daily-goals.index')->with('success', 'Daily Goal deleted successfully.');
+    }
+
+    /**
+     * دالة لفحص الوصول بالنسبة للوالد أو الطفل
+     */
+    private function checkAccess(DailyGoal $dailyGoal)
+    {
+        /**  @var User $user */
+        $user = Auth::user();
+
+        if ($user->role->name === 'admin') return;
+
+        if ($user->role->name === 'parent') {
+            $kidsIds = $user->children()->pluck('kids.id');
+            abort_unless(in_array($dailyGoal->kid_id, $kidsIds->toArray()), 403, 'Unauthorized access');
+        }
+
+        if ($user->role->name === 'kid') {
+            $kidId = $user->kid?->id;
+            abort_unless($dailyGoal->kid_id === $kidId, 403, 'Unauthorized access');
+        }
+    }
+
+    private function authorizeRole($role)
+    {
+        $user = Auth::user();
+        abort_unless($user && $user->role->name === $role, 403, 'Unauthorized action.');
     }
 }

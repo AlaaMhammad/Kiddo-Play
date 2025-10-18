@@ -11,15 +11,18 @@
         <form action="{{ route('admin.kids.update', $kid->id) }}" method="POST">
             @csrf
             @method('PUT')
-            @if ($parents)
-                {{-- Parent --}}
-                <x-form.select name="parent_id" label="Parent" :options="$parents" :selected="$kid->user_id" required />
+
+            {{-- Parent --}}
+            @if ($parents && auth()->user()->role->name === 'admin')
+                {{-- فقط الأدمن يرى القائمة لاختيار الأب --}}
+                <x-form.select name="parent_id" label="Parent" :options="$parents" :selected="$kid->parents->first()->id ?? null" required />
             @else
+                {{-- الأب الحالي مرتبط بالطفل، نخفي الحقل --}}
                 <input type="hidden" name="parent_id" value="{{ $parentId }}">
             @endif
 
             {{-- Display Name --}}
-            <x-form.input name="display_name" label="Display Name" :value="$kid->display_name" />
+            <x-form.input name="display_name" label="Display Name" :value="$kid->display_name" required />
 
             {{-- Date of Birth --}}
             <x-form.date name="dob" label="Date of Birth" :value="$kid->dob" />
@@ -38,7 +41,15 @@
             {{-- Points --}}
             <x-form.number name="points" label="Points" :value="$kid->points" />
 
-            {{-- Submit Button --}}
+            <hr>
+
+            {{-- Child Account --}}
+            <h5>Child Login Account</h5>
+            <x-form.input name="email" label="Email" type="email" :value="$kid->user->email" required />
+            <x-form.input name="password" label="New Password (leave blank to keep current)" type="password" />
+            <x-form.input name="password_confirmation" label="Confirm New Password" type="password" />
+
+            {{-- Submit --}}
             <x-form.button label="Update Kid" />
         </form>
     </div>

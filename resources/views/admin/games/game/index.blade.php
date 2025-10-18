@@ -27,8 +27,10 @@
     <div class="card">
         <div class="card-header d-flex justify-content-between">
             <h5>All Games</h5>
-            <a href="{{ route('admin.games.create') }}" class="btn btn-primary btn-sm"><i class="bx bx-plus"></i> Add
-                New</a>
+            @can('create', App\Models\Game::class)
+                <a href="{{ route('admin.games.create') }}" class="btn btn-primary btn-sm"><i class="bx bx-plus"></i> Add
+                    New</a>
+            @endcan
         </div>
 
         <div class="card-body">
@@ -58,17 +60,23 @@
                                 @endif
                             </td>
                             <td>
-                                <a href="{{ route('admin.games.show', $game->id) }}" class="btn btn-sm btn-info"><i
-                                        class="bx bx-show"></i></a>
-                                <a href="{{ route('admin.games.edit', $game->id) }}" class="btn btn-sm btn-warning"><i
-                                        class="bx bx-edit"></i></a>
-                                <form action="{{ route('admin.games.destroy', $game->id) }}" method="POST"
-                                    class="d-inline">
-                                    @csrf @method('DELETE')
-                                    <button class="btn btn-sm btn-danger"
-                                        onclick="return confirm('Delete this game?')"><i
-                                            class="bx bx-trash"></i></button>
-                                </form>
+                                @can('view', $game)
+                                    <a href="{{ route('admin.games.show', $game->id) }}" class="btn btn-sm btn-info"><i
+                                            class="bx bx-show"></i></a>
+                                @endcan
+                                @can('update', $game)
+                                    <a href="{{ route('admin.games.edit', $game->id) }}" class="btn btn-sm btn-warning"><i
+                                            class="bx bx-edit"></i></a>
+                                @endcan
+                                @can('delete', $game)
+                                    <form action="{{ route('admin.games.destroy', $game->id) }}" method="POST"
+                                        class="d-inline">
+                                        @csrf @method('DELETE')
+                                        <button class="btn btn-sm btn-danger"
+                                            onclick="return confirm('Delete this game?')"><i
+                                                class="bx bx-trash"></i></button>
+                                    </form>
+                                @endcan
                             </td>
                         </tr>
                     @empty

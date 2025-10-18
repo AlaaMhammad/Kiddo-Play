@@ -25,9 +25,11 @@
     <div class="card">
         <div class="card-header d-flex justify-content-between align-items-center">
             <h5 class="mb-0">All Rewards</h5>
+            @if(auth()->user()->role->name === 'admin')
             <a href="{{ route('admin.rewards.create') }}" class="btn btn-primary btn-sm">
                 <i class="bx bx-plus"></i> Add New
             </a>
+            @endif
         </div>
 
         <div class="card-body">
@@ -58,18 +60,22 @@
                                     @endif
                                 </td>
                                 <td class="text-center">
+                                    {{-- زر العرض متاح لكل من يمكنه رؤية المكافأة --}}
                                     <a href="{{ route('admin.rewards.show', $reward->id) }}"
                                         class="btn btn-sm btn-info"><i class="bx bx-show"></i></a>
-                                    <a href="{{ route('admin.rewards.edit', $reward) }}"
-                                        class="btn btn-sm btn-warning"><i class="bx bx-edit"></i></a>
-                                    <form action="{{ route('admin.rewards.destroy', $reward) }}" method="POST"
-                                        class="d-inline-block">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button class="btn btn-sm btn-danger"
-                                            onclick="return confirm('Are you sure?')"><i
-                                                class="bx bx-trash"></i></button>
-                                    </form>
+                                    {{-- زر التعديل والحذف للأدمن فقط --}}
+                                    @if (auth()->user()->role->name === 'admin')
+                                        <a href="{{ route('admin.rewards.edit', $reward) }}"
+                                            class="btn btn-sm btn-warning"><i class="bx bx-edit"></i></a>
+                                        <form action="{{ route('admin.rewards.destroy', $reward) }}" method="POST"
+                                            class="d-inline-block">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button class="btn btn-sm btn-danger"
+                                                onclick="return confirm('Are you sure?')"><i
+                                                    class="bx bx-trash"></i></button>
+                                        </form>
+                                    @endif
                                 </td>
                             </tr>
                         @empty

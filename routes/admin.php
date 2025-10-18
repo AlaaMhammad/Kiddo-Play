@@ -227,6 +227,8 @@ Route::middleware('isParent')->prefix('admin')->name('admin.')->group(function (
     // // Kids
     // Route::resource('kids', KidController::class)->only(['index', 'show', 'edit', 'update']);
     // Route::get('kids/{kid}/show-auth', [KidController::class, 'showKidAuth'])->name('kids.show-auth');
+    Route::post('kids/create-account', [KidController::class, 'createAccount'])
+    ->name('kids.createAccount');
 
 
     // Route::resource('kid-achievements', KidAchievementController::class)->only(['index', 'show']);

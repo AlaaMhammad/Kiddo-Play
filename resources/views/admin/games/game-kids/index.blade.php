@@ -10,8 +10,10 @@
     <div class="card">
         <div class="card-header d-flex justify-content-between">
             <h5>All Game-Kids Records</h5>
-            <a href="{{ route('admin.game-kids.create') }}" class="btn btn-primary btn-sm"><i class="bx bx-plus"></i> Add
-                New</a>
+            @can('create', GameKid::class)
+                <a href="{{ route('admin.game-kids.create') }}" class="btn btn-primary btn-sm"><i class="bx bx-plus"></i> Add
+                    New</a>
+            @endcan
         </div>
         <div class="card-body">
             <table class="table table-hover">
@@ -37,17 +39,23 @@
                             <td>{{ $gk->last_played_at ? \Carbon\Carbon::parse($gk->last_played_at)->format('Y-m-d H:i') : '-' }}
                             </td>
                             <td>
-                                <a href="{{ route('admin.game-kids.show', $goal->id) }}" class="btn btn-sm btn-info"><i
-                                        class=""></i><i class="bx bx-show"></a>
-                                <a href="{{ route('admin.game-kids.edit', $gk->id) }}" class="btn btn-sm btn-warning"><i
-                                        class="bx bx-edit"></a>
-                                <form action="{{ route('admin.game-kids.destroy', $gk->id) }}" method="POST"
-                                    class="d-inline">
-                                    @csrf @method('DELETE')
-                                    <button class="btn btn-sm btn-danger"
-                                        onclick="return confirm('Delete this record?')"><i
-                                            class="bx bx-trash"></i></button>
-                                </form>
+                                @can('view', $gk)
+                                    <a href="{{ route('admin.game-kids.show', $gk->id) }}" class="btn btn-sm btn-info"><i
+                                            class=""></i><i class="bx bx-show"></a>
+                                @endcan
+                                @can('update', $gk)
+                                    <a href="{{ route('admin.game-kids.edit', $gk->id) }}" class="btn btn-sm btn-warning"><i
+                                            class="bx bx-edit"></a>
+                                @endcan
+                                @can('delete', $gk)
+                                    <form action="{{ route('admin.game-kids.destroy', $gk->id) }}" method="POST"
+                                        class="d-inline">
+                                        @csrf @method('DELETE')
+                                        <button class="btn btn-sm btn-danger"
+                                            onclick="return confirm('Delete this record?')"><i
+                                                class="bx bx-trash"></i></button>
+                                    </form>
+                                @endcan
                             </td>
                         </tr>
                     @empty

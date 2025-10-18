@@ -6,32 +6,64 @@ use App\Http\Controllers\Controller;
 use App\Models\PointsTransaction;
 use App\Models\Kid;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class PointsTransactionController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        $transactions = PointsTransaction::with('kid')->latest()->paginate(10);
+        /** @var User $user */
+        $user = Auth::user();
+
+        if ($user->role->name === 'admin') {
+            $transactions = PointsTransaction::with('kid')->latest()->paginate(10);
+        } elseif ($user->role->name === 'parent') {
+            $kidsIds = $user->children()->pluck('kids.id');
+            $transactions = PointsTransaction::with('kid')
+                ->whereIn('kid_id', $kidsIds)
+                ->latest()
+                ->paginate(10);
+        } elseif ($user->role->name === 'kid') {
+            $transactions = PointsTransaction::with('kid')
+                ->where('kid_id', $user->kid?->id)
+                ->latest()
+                ->paginate(10);
+        } else {
+            abort(403, 'Unauthorized');
+        }
+
         return view('admin.Points.points-transactions.index', compact('transactions'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
+    public function show(PointsTransaction $pointsTransaction)
+    {
+        /** @var User $user */
+        $user = Auth::user();
+
+        if ($user->role->name === 'parent' && !$user->children()->where('kids.id', $pointsTransaction->kid_id)->exists()) {
+            abort(403, 'Unauthorized access.');
+        }
+
+        if ($user->role->name === 'kid' && $pointsTransaction->kid_id !== $user->kid?->id) {
+            abort(403, 'Unauthorized access.');
+        }
+
+        $pointsTransaction->load('kid');
+        return view('admin.Points.points-transactions.show', compact('pointsTransaction'));
+    }
+
     public function create()
     {
+        $this->authorizeAdmin();
+
         $kids = Kid::all();
         return view('admin.Points.points-transactions.create', compact('kids'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
+        $this->authorizeAdmin();
+
         $validated = $request->validate([
             'kid_id' => 'required|exists:kids,id',
             'type' => 'required|in:earn,spend,adjust',
@@ -46,29 +78,18 @@ class PointsTransactionController extends Controller
         return redirect()->route('admin.points-transactions.index')->with('success', 'Transaction created successfully.');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(PointsTransaction $pointsTransaction)
-    {
-        $pointsTransaction->load('kid');
-        return view('admin.Points.points-transactions.show', compact('pointsTransaction'));
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(PointsTransaction $pointsTransaction)
     {
+        $this->authorizeAdmin();
+
         $kids = Kid::all();
         return view('admin.Points.points-transactions.edit', compact('pointsTransaction', 'kids'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, PointsTransaction $pointsTransaction)
     {
+        $this->authorizeAdmin();
+
         $validated = $request->validate([
             'kid_id' => 'required|exists:kids,id',
             'type' => 'required|in:earn,spend,adjust',
@@ -83,12 +104,17 @@ class PointsTransactionController extends Controller
         return redirect()->route('admin.points-transactions.index')->with('success', 'Transaction updated successfully.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(PointsTransaction $pointsTransaction)
     {
+        $this->authorizeAdmin();
+
         $pointsTransaction->delete();
         return redirect()->route('admin.points-transactions.index')->with('success', 'Transaction deleted successfully.');
+    }
+
+    private function authorizeAdmin()
+    {
+        $user = Auth::user();
+        abort_unless($user && $user->role->name === 'admin', 403, 'Unauthorized action.');
     }
 }

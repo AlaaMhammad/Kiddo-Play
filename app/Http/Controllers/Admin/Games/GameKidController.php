@@ -4,33 +4,62 @@ namespace App\Http\Controllers\Admin\Games;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\GameKid;
 use App\Models\Game;
 use App\Models\Kid;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 class GameKidController extends Controller
 {
+    /**
+     * عرض جميع سجلات الألعاب للأطفال مع صلاحيات
+     */
     public function index()
     {
-        $gameKids = DB::table('game_kids')
-            ->join('games', 'game_kids.game_id', '=', 'games.id')
-            ->join('kids', 'game_kids.kid_id', '=', 'kids.id')
-            ->select('game_kids.*', 'games.description as game_desc', 'kids.display_name as kid_name')
-            ->latest('game_kids.created_at')
-            ->paginate(15);
+        /** @var User $user */
+        $user = Auth::user();
+
+        if ($user->role->name === 'admin') {
+            // الأدمن يرى كل السجلات
+            $gameKids = GameKid::with(['game:id,description', 'kid:id,display_name'])
+                ->latest()
+                ->paginate(15);
+        } elseif ($user->role->name === 'parent') {
+            // الأب يرى سجلات أطفاله فقط
+            $kidsIds = $user->children()->pluck('kids.id');
+            $gameKids = GameKid::with(['game:id,description', 'kid:id,display_name'])
+                ->whereIn('kid_id', $kidsIds)
+                ->latest()
+                ->paginate(15);
+        } elseif ($user->role->name === 'kid') {
+            // الطفل يرى سجله فقط
+            $gameKids = GameKid::with(['game:id,description', 'kid:id,display_name'])
+                ->where('kid_id', $user->kid?->id)
+                ->latest()
+                ->paginate(15);
+        } else {
+            abort(403, 'Unauthorized');
+        }
 
         return view('admin.games.game-kids.index', compact('gameKids'));
     }
 
+    /**
+     * إنشاء سجل جديد (الأدمن فقط)
+     */
     public function create()
     {
+        $this->authorizeAdmin();
+
         $games = Game::where('is_active', true)->get();
-        $kids = Kid::all()->toArray();
+        $kids = Kid::all();
         return view('admin.games.game-kids.create', compact('games', 'kids'));
     }
 
     public function store(Request $request)
     {
+        $this->authorizeAdmin();
+
         $data = $request->validate([
             'kid_id' => 'required|exists:kids,id',
             'game_id' => 'required|exists:games,id',
@@ -39,21 +68,27 @@ class GameKidController extends Controller
             'last_played_at' => 'nullable|date',
         ]);
 
-        DB::table('game_kids')->insert($data);
+        GameKid::create($data);
 
-        return redirect()->route('game-kids.index')->with('success', 'Game-Kid record created.');
+        return redirect()->route('game-kids.index')->with('success', 'Game-Kid record created successfully.');
     }
 
-    public function edit($id)
+    /**
+     * تعديل سجل (الأدمن فقط)
+     */
+    public function edit(GameKid $gameKid)
     {
-        $record = DB::table('game_kids')->where('id', $id)->first();
+        $this->authorizeAdmin();
+
         $games = Game::where('is_active', true)->get();
-        $kids = Kid::all()->toArray();
-        return view('admin.games.game-kids.edit', compact('record', 'games', 'kids'));
+        $kids = Kid::all();
+        return view('admin.games.game-kids.edit', compact('gameKid', 'games', 'kids'));
     }
 
-    public function update(Request $request, $id)
+    public function update(Request $request, GameKid $gameKid)
     {
+        $this->authorizeAdmin();
+
         $data = $request->validate([
             'kid_id' => 'required|exists:kids,id',
             'game_id' => 'required|exists:games,id',
@@ -62,14 +97,28 @@ class GameKidController extends Controller
             'last_played_at' => 'nullable|date',
         ]);
 
-        DB::table('game_kids')->where('id', $id)->update($data);
+        $gameKid->update($data);
 
         return redirect()->route('game-kids.index')->with('success', 'Record updated successfully.');
     }
 
-    public function destroy($id)
+    /**
+     * حذف سجل (الأدمن فقط)
+     */
+    public function destroy(GameKid $gameKid)
     {
-        DB::table('game_kids')->where('id', $id)->delete();
+        $this->authorizeAdmin();
+
+        $gameKid->delete();
         return redirect()->route('game-kids.index')->with('success', 'Record deleted successfully.');
+    }
+
+    /**
+     * دالة مساعدة لفحص صلاحية الأدمن
+     */
+    private function authorizeAdmin()
+    {
+        $user = Auth::user();
+        abort_unless($user && $user->role->name === 'admin', 403, 'Unauthorized action.');
     }
 }
