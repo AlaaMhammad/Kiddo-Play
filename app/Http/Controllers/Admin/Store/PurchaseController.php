@@ -110,7 +110,7 @@ class PurchaseController extends Controller
         if ($user->role->name === 'admin') return;
 
         if ($user->role->name === 'parent') {
-            $kidsIds = $user->children()->pluck('kids.id');
+            $kidsIds = $user->children()->pluck('kids.id')->toArray();
             abort_unless(in_array($purchase->kid_id, $kidsIds), 403, 'Unauthorized access.');
         }
 
