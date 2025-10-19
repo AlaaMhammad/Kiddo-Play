@@ -1,4 +1,3 @@
-
 <!doctype html>
 <html lang="en" class="layout-wide customizer-hide" dir="ltr" data-skin="default"
     data-assets-path="{{ asset('dashboard/assets/') }}" data-template="vertical-menu-template">
@@ -163,13 +162,12 @@
                                         class='bx bx-check-circle me-1'></i> Register</button>
                             </div>
 
-                            <div class="text-center">
-                                <a href="{{ route('login') }}"
-                                    class="d-flex align-items-center justify-content-center">
-                                    Login
-                                    <i class="bx bx-log-in-circle bx-sm"></i>
+                            <p class="text-center">
+                                <span>Already have an account?</span>
+                                <a href="{{ route('login') }}">
+                                    <span>Sign in instead</span>
                                 </a>
-                            </div>
+                            </p>
                         </form>
                     </div>
                 </div>

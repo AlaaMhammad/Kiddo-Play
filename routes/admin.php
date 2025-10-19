@@ -317,6 +317,12 @@ Route::get('/login', [AuthController::class, 'login'])->name('login');
 Route::post('/signin', [AuthController::class, 'signin'])->name('signin');
 Route::get('/register', [AuthController::class, 'register'])->name('register');
 Route::post('/signup', [AuthController::class, 'signup'])->name('signup');
+// 
+Route::get('/forgot-password', [AuthController::class, 'showForgotForm'])->name('forgot_password');
+Route::post('/reset-password', [AuthController::class, 'checkEmail'])->name('reset_password');
+// صفحة إدخال كلمة مرور جديدة
+Route::get('/set-new-password/{email}', [AuthController::class, 'showNewPasswordForm'])->name('set_new_password');
+Route::post('/set-new-password/{email}', [AuthController::class, 'saveNewPassword'])->name('save_new_password');
 Route::post('logout', [AuthController::class, 'logout'])->name('logout');
 
 // otp

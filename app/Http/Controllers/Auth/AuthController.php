@@ -121,6 +121,47 @@ class AuthController extends Controller
     }
 
 
+    public function showForgotForm()
+    {
+        return view('auth.forgot-password');
+    }
+
+    public function checkEmail(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email'
+        ]);
+
+        $user = User::where('email', $request->email)->first();
+
+        if (!$user) {
+            return back()->withErrors(['email', 'This email does not exist.'])->withInput();
+        }
+        flash()->success('Email successfully');
+        // إذا البريد صحيح → نوجه المستخدم لصفحة إدخال كلمة المرور الجديدة
+        return redirect()->route('set_new_password', ['email' => $request->email]);
+    }
+
+    // عرض صفحة إدخال كلمة المرور الجديدة
+    public function showNewPasswordForm($email)
+    {
+        return view('auth.reset-password', compact('email'));
+    }
+
+    // حفظ كلمة المرور الجديدة
+    public function saveNewPassword(Request $request, $email)
+    {
+        $request->validate([
+            'password' => 'required|min:6|confirmed'
+        ]);
+
+        $user = User::where('email', $email)->firstOrFail();
+
+        $user->password = Hash::make($request->password);
+        $user->save();
+        flash()->success('Password updated successfully. You can now log in.');
+        return redirect()->route('login');
+    }
 
 
     // function signup(Request $request)

@@ -2,7 +2,7 @@
 
 <html lang="en" class="layout-wide customizer-hide" dir="ltr" data-skin="default"
     data-assets-path="{{ asset('dashboard/assets/"
-                            data-template="vertical-menu-template') }}"
+                                            data-template="vertical-menu-template') }}"
     data-bs-theme="light">
 
 <head>
@@ -61,7 +61,7 @@
 
     <style>
         .btn-register {
-            background: linear-gradient(135deg, #3a86ff, #8338ec);
+            background: linear-gradient(135deg, #3aff47, #ec3838);
             color: #fff;
             font-weight: 600;
             border-radius: 16px;
@@ -118,7 +118,7 @@
                     <div class="card-body">
                         <!-- Logo -->
                         <div class="app-brand justify-content-center">
-                            <a href="index.html" class="app-brand-link gap-2">
+                            <a href="{{route('login')}}" class="app-brand-link gap-2">
                                 {{-- <span class="app-brand-logo demo">
                                     <span class="text-primary">
                                         <svg width="25" viewBox="0 0 25 42" version="1.1"
@@ -227,35 +227,50 @@
                             </div>
                             <div class="mb-7">
                                 <div class="d-flex justify-content-between">
-                                    <div class="form-check mb-0">
+                                    {{-- <div class="form-check mb-0">
                                         <input class="form-check-input" type="checkbox" id="remember-me" />
                                         <label class="form-check-label" for="remember-me"> Remember Me </label>
-                                    </div>
+                                    </div> --}}
+                                    <a href="{{ route('forgot_password')  }}">
+                                        <p class="mb-0">Forgot Password?</p>
+                                    </a>
                                 </div>
                             </div>
                             <div class="mb-6">
-                                <button class="btn btn-primary d-grid w-100">Login</button>
+                                <button class="btn btn-primary d-grid w-100">Sign in</button>
                             </div>
 
+                            <p class="text-center">
+                                <span class="me-2">New on our platform?</span>
+                                <a href="{{ route('register') }}">
+                                    <span class="btn btn-register  px-2 py-1">Create an account</span>
+                                </a>
+                            </p>
+
+                            <div class="divider my-6">
+                                <div class="divider-text">or</div>
+                            </div>
+
+                            {{--
                             <div class="d-flex flex-row gap-3 mt-4 justify-content-center flex-wrap">
                                 <a href="{{ route('register') }}"
                                     class="btn btn-register d-flex align-items-center justify-content-center px-4 py-3">
                                     <i class="bx bx-user-plus bx-lg me-2"></i>
                                     Create New Account
-                                </a>
+                                </a> --}}
 
-                                <a href="{{ route('guest.home') }}"
-                                    class="btn btn-guest d-flex align-items-center justify-content-center px-4 py-3">
-                                    <i class="bx bx-log-in bx-lg me-2"></i>
-                                    Continue as Guest
-                                </a>
-                            </div>
-                        </form>
+                            <a href="{{ route('guest.home') }}"
+                                class="btn btn-guest d-flex align-items-center justify-content-center px-4 py-3">
+                                <i class="bx bx-log-in bx-lg me-2"></i>
+                                Continue as Guest
+                            </a>
                     </div>
+                    </form>
                 </div>
-                <!-- /Login -->
             </div>
+            <!-- /Login -->
         </div>
+    </div>
     </div>
 
     <!-- / Content -->
