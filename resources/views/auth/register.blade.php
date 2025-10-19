@@ -158,13 +158,14 @@
 
 
                             <div class="mb-4">
-                                <button type="submit" class="btn btn-primary d-flex w-100"><i
-                                        class='bx bx-check-circle me-1'></i> Register</button>
+                                <button type="submit" class="btn btn-primary d-flex w-100">
+                                    <i class='bx bx-check-circle me-1'></i> Register
+                                </button>
                             </div>
 
                             <p class="text-center">
                                 <span>Already have an account?</span>
-                                <a href="{{ route('login') }}">
+                                <a class="text-primary" href="{{ route('login') }}">
                                     <span>Sign in instead</span>
                                 </a>
                             </p>
