@@ -612,7 +612,7 @@
     </ul>
 </aside>
 
-<script>
+{{-- <script>
     const toggleButton = document.querySelector('#menu-toggle-button'); // Replace with your actual button selector
     const body = document.body; // Or the main container of the sidebar
 
@@ -620,4 +620,4 @@
         // Toggles the class 'menu-collapsed' on the body element
         body.classList.toggle('menu-collapsed');
     });
-</script>
+</script> --}}

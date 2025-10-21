@@ -2,8 +2,13 @@
 
     @section('title', __('Account'))
 
-    <h4 class="fw-bold py-3 mb-4">
-        <span class="text-muted fw-light">{{ __('Account Settings') }} /</span> {{ __('Account') }}
+    <h4 class="fw-bold d-flex justify-content-between align-items-center py-3 mb-4">
+        <div class="">
+            <span class="text-muted fw-light">{{ __('Account Settings') }} /</span> {{ __('Account') }}
+        </div>
+        <a href="{{ route('admin.index') }}" class="btn btn-label-primary">
+            <i class="bx bx-arrow-back"></i> Back
+        </a>
     </h4>
 
     @if (session('success'))
