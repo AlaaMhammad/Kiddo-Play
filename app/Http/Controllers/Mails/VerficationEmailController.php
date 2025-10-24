@@ -10,7 +10,7 @@ use Illuminate\Http\Request;
 
 class VerficationEmailController extends Controller
 {
-    public function verficationemailpage($token) 
+    public function verficationemailpage($token)
     {
         $verfaction = VerfactionEmail::where('token', $token)->first();
 
@@ -31,7 +31,9 @@ class VerficationEmailController extends Controller
         $user = User::where('email', $verfaction->email)->first();
         $user->email_verified_at = Carbon::now(); // الوقت الحالي
         $user->save();
-        $verfaction->delete();
-        return redirect()->route('auth.login')->with('success', 'تم تفعيل حسابك بنجاح ');
+        // $verfaction->delete();
+
+        flash()->success('Your account has been successfully activated.');
+        return redirect()->route('login');
     }
 }

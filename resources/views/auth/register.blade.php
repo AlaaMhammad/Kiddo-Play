@@ -99,6 +99,7 @@
                                         id="addChildYes">Yes</button>
                                     <button type="button" class="btn btn-outline-secondary" id="addChildNo">No</button>
                                 </div>
+                                <input type="hidden" name="add_child" id="add_child" value="No">
                             </div>
 
                             <!-- Child Info (Initially Hidden) -->
@@ -193,6 +194,7 @@
         let childCount = 1;
 
         addChildYes.addEventListener('click', () => {
+            document.getElementById('add_child').value = 'Yes';
             childSection.style.display = 'block';
             addChildYes.classList.remove('btn-outline-primary');
             addChildYes.classList.add('btn-primary');
@@ -202,6 +204,7 @@
         });
 
         addChildNo.addEventListener('click', () => {
+            document.getElementById('add_child').value = 'No';
             childSection.style.display = 'none';
             addChildNo.classList.remove('btn-outline-secondary');
             addChildNo.classList.add('btn-secondary');

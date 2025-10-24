@@ -5,7 +5,8 @@ use Illuminate\Http\Request;
 
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\Auth\AuthController;
+use App\Http\Controllers\Api\Auth\VerficationEmailController;
 use App\Http\Controllers\Api\GameController;
 use App\Http\Controllers\Api\LessonController;
 use App\Http\Controllers\Api\QuizController;
@@ -46,6 +47,9 @@ Route::prefix('v1')->group(function () {
     Route::post('/reset-password', [AuthController::class, 'resetPassword']);
     Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
 
+    Route::get('verfactionemail', [VerficationEmailController::class, 'verifyEmailToken']);
+    Route::post('verify-email', [VerficationEmailController::class, 'verifyEmailOtp']);
+
 
 
     /*
@@ -84,4 +88,3 @@ Route::prefix('v1')->group(function () {
     //     Route::post('/notifications/read', [NotificationController::class, 'markAsRead']);
     // });
 });
-

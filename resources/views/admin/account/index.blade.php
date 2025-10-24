@@ -145,8 +145,9 @@
                                 </p>
                             </div>
                         </div>
-                        <form id="formAccountDeactivation" method="POST" enctype="multipart/form-data">
+                        <form id="formAccountDeactivation" method="POST" action="{{ route('admin.account.delete') }}">
                             @csrf
+                            @method('DELETE') <!-- مهم جدًا -->
                             <div class="form-check mb-3">
                                 <input class="form-check-input" type="checkbox" name="accountActivation"
                                     id="accountActivation" />
@@ -251,67 +252,67 @@
                 });
 
                 // Delete Account Form
-                $('#formAccountDeactivation').on('submit', function(e) {
-                    e.preventDefault();
+                // $('#formAccountDeactivation').on('submit', function(e) {
+                //     e.preventDefault();
 
-                    if (!$('#accountActivation').is(':checked')) {
-                        Swal.fire(
-                            "{{ __('Warning') }}",
-                            "{{ __('Please confirm account deactivation by checking the checkbox') }}",
-                            'warning'
-                        );
-                        return false;
-                    }
+                //     if (!$('#accountActivation').is(':checked')) {
+                //         Swal.fire(
+                //             "{{ __('Warning') }}",
+                //             "{{ __('Please confirm account deactivation by checking the checkbox') }}",
+                //             'warning'
+                //         );
+                //         return false;
+                //     }
 
-                    Swal.fire({
-                        title: "{{ __('Warning') }}",
-                        text: "{{ __('Are you sure you want to delete your account? This action cannot be undone.') }}",
-                        icon: 'warning',
-                        showCancelButton: true,
-                        confirmButtonColor: '#d33',
-                        cancelButtonColor: '#3085d6',
-                        confirmButtonText: "{{ __('Delete Account') }}",
-                        cancelButtonText: "{{ __('Cancel') }}"
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            $.ajax({
-                                url: "{{ url('admin/account/delete') }}",
-                                headers: {
-                                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                                },
-                                type: 'POST',
-                                dataType: 'JSON',
-                                success: function(response) {
-                                    if (response.status == 1) {
-                                        Swal.fire({
-                                            title: "{{ __('Success') }}",
-                                            text: "{{ __('Account deleted successfully') }}",
-                                            icon: 'success',
-                                            confirmButtonText: "{{ __('Ok') }}"
-                                        }).then((result) => {
-                                            window.location.href =
-                                                "{{ url('auth/logout') }}";
-                                        });
-                                    } else {
-                                        Swal.fire(
-                                            "{{ __('Error') }}",
-                                            response.message,
-                                            'error'
-                                        );
-                                    }
-                                },
-                                error: function(data) {
-                                    var errors = data.responseJSON;
-                                    Swal.fire(
-                                        "{{ __('Error') }}",
-                                        errors.message,
-                                        'error'
-                                    );
-                                }
-                            });
-                        }
-                    });
-                });
+                //     Swal.fire({
+                //         title: "{{ __('Warning') }}",
+                //         text: "{{ __('Are you sure you want to delete your account? This action cannot be undone.') }}",
+                //         icon: 'warning',
+                //         showCancelButton: true,
+                //         confirmButtonColor: '#d33',
+                //         cancelButtonColor: '#3085d6',
+                //         confirmButtonText: "{{ __('Delete Account') }}",
+                //         cancelButtonText: "{{ __('Cancel') }}"
+                //     }).then((result) => {
+                //         if (result.isConfirmed) {
+                //             $.ajax({
+                //                 url: "{{ route('admin.account.delete') }}",
+                //                 headers: {
+                //                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                //                 },
+                //                 type: 'POST',
+                //                 dataType: 'JSON',
+                //                 success: function(response) {
+                //                     if (response.status == 1) {
+                //                         Swal.fire({
+                //                             title: "{{ __('Success') }}",
+                //                             text: "{{ __('Account deleted successfully') }}",
+                //                             icon: 'success',
+                //                             confirmButtonText: "{{ __('Ok') }}"
+                //                         }).then((result) => {
+                //                             window.location.href =
+                //                                 "{{ url('logout') }}";
+                //                         });
+                //                     } else {
+                //                         Swal.fire(
+                //                             "{{ __('Error') }}",
+                //                             response.message,
+                //                             'error'
+                //                         );
+                //                     }
+                //                 },
+                //                 error: function(data) {
+                //                     var errors = data.responseJSON;
+                //                     Swal.fire(
+                //                         "{{ __('Error') }}",
+                //                         errors.message,
+                //                         'error'
+                //                     );
+                //                 }
+                //             });
+                //         }
+                //     });
+                // });
 
                 $(document.body).on('change', '.image-input', function() {
                     const fileInput = document.querySelector('.image-input');

@@ -176,6 +176,15 @@ Route::middleware('guest')->name('guest.')->group(function () {
     |--------------------------------------------------------------------------
     */
 Route::middleware('isKid')->prefix('admin')->name('admin.')->group(function () {
+
+    // Acount
+    Route::prefix('account')->name('account.')->group(function () {
+        Route::get('/', [AdminController::class, 'profile'])->name('profile');
+        Route::post('/update', [AdminController::class, 'update']);
+        Route::delete('/delete', [AdminController::class, 'delete'])->name('delete');
+
+        Route::post('/password/change', [AdminController::class, 'change_password'])->name('change_password');;
+    });
     // Dashboard
     Route::get('/', [AdminController::class, 'index'])->name('index');
 
@@ -228,7 +237,7 @@ Route::middleware('isParent')->prefix('admin')->name('admin.')->group(function (
     // Route::resource('kids', KidController::class)->only(['index', 'show', 'edit', 'update']);
     // Route::get('kids/{kid}/show-auth', [KidController::class, 'showKidAuth'])->name('kids.show-auth');
     Route::post('kids/create-account', [KidController::class, 'createAccount'])
-    ->name('kids.createAccount');
+        ->name('kids.createAccount');
 
 
     // Route::resource('kid-achievements', KidAchievementController::class)->only(['index', 'show']);
@@ -257,13 +266,14 @@ Route::middleware('isParent')->prefix('admin')->name('admin.')->group(function (
 */
 Route::middleware('isAdmin')->prefix('admin')->name('admin.')->group(function () {
 
-    // Acount
-    Route::prefix('account')->name('account.')->group(function () {
-        Route::get('/', [AdminController::class, 'profile'])->name('profile');
-        Route::post('/update', [AdminController::class, 'update']);
-        Route::post('/delete', [AdminController::class, 'delete']);
-        Route::post('/password/change', [AdminController::class, 'change_password'])->name('change_password');;
-    });
+    // // Acount
+    // Route::prefix('account')->name('account.')->group(function () {
+    //     Route::get('/', [AdminController::class, 'profile'])->name('profile');
+    //     Route::post('/update', [AdminController::class, 'update']);
+    //     Route::post('/delete', [AdminController::class, 'delete'])->name('delete');
+
+    //     Route::post('/password/change', [AdminController::class, 'change_password'])->name('change_password');;
+    // });
 
     // Users
     Route::resource('users', UserController::class);
@@ -317,7 +327,7 @@ Route::get('/login', [AuthController::class, 'login'])->name('login');
 Route::post('/signin', [AuthController::class, 'signin'])->name('signin');
 Route::get('/register', [AuthController::class, 'register'])->name('register');
 Route::post('/signup', [AuthController::class, 'signup'])->name('signup');
-// 
+//
 Route::get('/forgot-password', [AuthController::class, 'showForgotForm'])->name('forgot_password');
 Route::post('/reset-password', [AuthController::class, 'checkEmail'])->name('reset_password');
 // صفحة إدخال كلمة مرور جديدة

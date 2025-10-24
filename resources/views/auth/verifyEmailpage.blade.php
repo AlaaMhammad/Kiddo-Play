@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Verification</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            width: 100%;
+            padding: 30px;
+            text-align: center;
+        }
+
+        h1 {
+            color: #1a73e8;
+            margin-bottom: 20px;
+        }
+
+        p {
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+
+        .otp-input {
+            width: 93%;
+            padding: 12px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 16px;
+        }
+
+        .btn {
+            background: #1a73e8;
+            color: white;
+            padding: 12px;
+            width: 100%;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.3s;
+        }
+
+        .btn:hover {
+            background: #155ab6;
+        }
+
+        .error {
+            color: red;
+            margin-bottom: 15px;
+        }
+
+        .success {
+            color: green;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+
+        <div class="app-brand justify-content-center mb-3">
+            <img src="{{ asset('dashboard/assets/img/kiddo.png') }}" alt="logo"
+                style="object-fit: cover; width: 20vw; height: 100px;">
+        </div>
+
+        <h1>Email Verification</h1>
+
+        @if (session('error'))
+            <div class="error">{{ session('error') }}</div>
+        @endif
+
+        @if (session('success'))
+            <div class="success">{{ session('success') }}</div>
+        @endif
+
+        <p>Please enter the OTP code sent to your email address.</p>
+
+        <form action="{{ url('verify-email') }}" method="POST">
+            @csrf
+            <input type="text" name="otp" class="otp-input" placeholder="Enter OTP" required>
+            <button type="submit" class="btn">Verify</button>
+        </form>
+    </div>
+</body>
+
+</html>

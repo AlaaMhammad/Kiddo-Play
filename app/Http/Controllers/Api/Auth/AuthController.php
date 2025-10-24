@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Api;
+namespace App\Http\Controllers\Api\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
@@ -9,45 +9,14 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
+use App\Models\VerfactionEmail;
+use App\Mail\VerfiyEmail;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 
 class AuthController extends Controller
 {
     // تسجيل الدخول
-    // public function login(Request $request)
-    // {
-    //     $request->validate([
-    //         'email' => 'required|email',
-    //         'password' => 'required'
-    //     ]);
-
-    //     if (!Auth::attempt($request->only('email', 'password'))) {
-    //         return response()->json(['message' => 'Invalid credentials'], 401);
-    //     }
-
-    //     /** @var User $user */
-    //     $user = Auth::user();
-
-    //     if ($user->banned) {
-    //         return response()->json(['message' => 'Your account is banned'], 403);
-    //     }
-
-    //     // تحقق إذا عنده توكنات نشطة
-    //     if ($user->tokens()->exists()) {
-    //         return response()->json([
-    //             'message' => 'User already logged in',
-    //             'user' => $user
-    //         ]);
-    //     }
-
-    //     // إنشاء توكن جديد
-    //     $token = $user->createToken('auth_token')->plainTextToken;
-
-    //     return response()->json([
-    //         'message' => 'Login successful',
-    //         'user' => $user,
-    //         'token' => $token
-    //     ]);
-    // }
     public function login(Request $request)
     {
         $request->validate([
@@ -59,11 +28,17 @@ class AuthController extends Controller
             return response()->json(['message' => 'Invalid credentials'], 401);
         }
 
+
         /** @var User $user */
         $user = Auth::user();
 
         if ($user->banned) {
             return response()->json(['message' => 'Your account is banned'], 403);
+        }
+
+        if (in_array($user->role->name, ['parent']) && $user->email_verified_at === null) {
+            Auth::logout();
+            return response()->json(['message' => 'Please verify your email before logging in'], 403);
         }
 
         // إذا عنده توكنات نشطة، نرجع رسالة بدون بيانات المستخدم
@@ -93,12 +68,13 @@ class AuthController extends Controller
             'parentName' => 'required|string|max:255',
             'parentEmail' => 'required|email|unique:users,email',
             'parentPassword' => 'required|confirmed|min:6',
-            'children' => 'sometimes|array|min:1',
-            'children.*.name' => 'sometimes|string|max:255',
-            'children.*.dob' => 'sometimes|date',
-            'children.*.gender' => 'sometimes|in:male,female,other',
-            'children.*.email' => 'sometimes|email|distinct|unique:users,email',
-            'children.*.password' => 'sometimes|confirmed|min:6',
+            'add_child' => 'required',
+            'children' => 'nullable|array|min:1',
+            'children.*.name' => 'nullable|string|max:255',
+            'children.*.dob' => 'nullable|date',
+            'children.*.gender' => 'nullable|in:male,female,other',
+            'children.*.email' => 'nullable|email|distinct|unique:users,email',
+            'children.*.password' => 'nullable|confirmed|min:6',
         ]);
 
         $parentRoleId = DB::table('roles')->where('name', 'parent')->value('id');
@@ -111,6 +87,28 @@ class AuthController extends Controller
             'plain_password' => $request->parentPassword,
             'role_id' => $parentRoleId,
         ]);
+
+        // mail verfiction:link,otp
+        if ($parent) {
+            $otp = mt_rand(100000, 999999); // بتولد ارقام عشوائية مكونة من 6لا خانات
+            $token = Str::random(50); // 50 خانة
+
+            VerfactionEmail::create([
+                'email' => $parent->email,
+                'otp' => $otp,
+                'token' => $token,
+                'expire' => now()->addMinutes(10)->format('Y-m-d H:i:s'),
+            ]);
+
+            $verfactionurl = url('verfactionemail/' . $token);
+            Mail::to($parent->email)->send(new VerfiyEmail($verfactionurl, $otp));
+            return response()->json([
+                'message' => 'Account created successfully. Please verify your email.',
+                'expire' => now()->addMinutes(10)->format('Y-m-d H:i:s'),
+                'token' => $token
+
+            ]);
+        }
 
         foreach ($request->children as $child) {
             $childUser = User::create([

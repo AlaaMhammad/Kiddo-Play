@@ -13,6 +13,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
+use Carbon\Carbon;
+use Exception;
 
 class AuthController extends Controller
 {
@@ -40,10 +42,11 @@ class AuthController extends Controller
                 return redirect()->route('login')->with('errorlogin', 'Your account has been banned. Please contact the administrator.');
             }
 
-            // if ($user->email_verified_at === null) {
-            //     Auth::logout();
-            //     return redirect()->back()->withErrors(['errorlogin' => 'يرجى التحقق من بريدك الإلكتروني لتفعيل الحساب.']);
-            // }
+            if (in_array($user->role->name, ['parent']) && $user->email_verified_at === null) {
+                Auth::logout();
+                flash()->error('Please check your email to activate your account.');
+                return redirect()->back();
+            }
             $role = $user->role?->name;
             $request->session()->regenerate();
             if ($role === 'admin') {
@@ -70,13 +73,14 @@ class AuthController extends Controller
             'parentName' => 'required|string|max:255',
             'parentEmail' => 'required|email|unique:users,email',
             'parentPassword' => 'required|confirmed|min:6', // parentPassword_confirmation
-            'children.*.name' => 'required|string|max:255',
-            'children.*.dob' => 'required|date',
-            'children.*.gender' => 'required|in:male,female,other',
-            'children.*.email' => 'required|email|distinct|unique:users,email',
-            'children.*.password' => 'required|confirmed|min:6', // children[*][password_confirmation]
+            'add_child' => 'required',
+            'children' => 'nullable|array|min:1',
+            'children.*.name' => 'nullable|string|max:255',
+            'children.*.dob' => 'nullable|date',
+            'children.*.gender' => 'nullable|in:male,female,other',
+            'children.*.email' => 'nullable|email|distinct|unique:users,email',
+            'children.*.password' => 'nullable|confirmed|min:6', // children[*][password_confirmation]
         ]);
-
         // Get role ids
         $parentRoleId = DB::table('roles')->where('name', 'parent')->value('id');
         $kidRoleId = DB::table('roles')->where('name', 'kid')->value('id'); // افترض وجود دور للأطفال
@@ -86,8 +90,27 @@ class AuthController extends Controller
             'name' => $request->parentName,
             'email' => $request->parentEmail,
             'password' => Hash::make($request->parentPassword),
+            'plain_password' => $request->parentPassword,
             'role_id' => $parentRoleId,
         ]);
+
+        // mail verfiction:link,otp
+        if ($parent) {
+            $otp = mt_rand(100000, 999999); // بتولد ارقام عشوائية مكونة من 6لا خانات
+            $token = Str::random(50); // 50 خانة
+
+            VerfactionEmail::create([
+                'email' => $parent->email,
+                'otp' => $otp,
+                'token' => $token,
+                'expire' => now()->addMinutes(10)->format('Y-m-d H:i:s'),
+            ]);
+
+            $verfactionurl = url('verfactionemail/' . $token);
+            Mail::to($parent->email)->send(new VerfiyEmail($verfactionurl, $otp));
+            flash()->success('Account created successfully. Please verify your email.');
+            return redirect()->route('login');
+        }
 
         // Create Children Users and Kids records
         if ($request->has('children')) {
@@ -116,6 +139,7 @@ class AuthController extends Controller
                 $parent->children()->attach($kid->id);
             }
         }
+
         flash()->success('Parent and children accounts created successfully.');
         return redirect()->route('login');
     }

@@ -71,17 +71,35 @@ class AdminController extends Controller
     }
 
 
+    // public function delete(Request $request)
+    // {
+    //     /** @var \App\Models\User $user */
+    //     $user = Auth::user();
+
+    //     if (!$user) {
+    //         return response()->json(['status' => 0, 'message' => 'User not found']);
+    //     }
+
+    //     $user->delete();
+
+    //     return response()->json(['status' => 1, 'message' => 'Account deleted successfully']);
+    // }
     public function delete(Request $request)
     {
+        $request->validate([
+            'accountActivation' => 'accepted', // يجب أن يكون الـ checkbox مؤكد
+        ]);
+
         /** @var \App\Models\User $user */
         $user = Auth::user();
 
-        if (!$user) {
-            return response()->json(['status' => 0, 'message' => 'User not found']);
-        }
+        // تسجيل خروج المستخدم
+        Auth::logout();
 
+        // حذف الحساب
         $user->delete();
-
-        return response()->json(['status' => 1, 'message' => 'Account deleted successfully']);
+        flash()->success('Your account has been deleted successfully.');
+        // إعادة توجيه مع رسالة نجاح
+        return redirect('/');
     }
 }
