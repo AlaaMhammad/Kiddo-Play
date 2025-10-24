@@ -68,24 +68,23 @@ class AuthController extends Controller
 
     public function signup(Request $request)
     {
-        // Validate Parent Info
         $request->validate([
             'parentName' => 'required|string|max:255',
             'parentEmail' => 'required|email|unique:users,email',
-            'parentPassword' => 'required|confirmed|min:6', // parentPassword_confirmation
+            'parentPassword' => 'required|confirmed|min:6',
             'add_child' => 'required',
             'children' => 'nullable|array|min:1',
             'children.*.name' => 'nullable|string|max:255',
             'children.*.dob' => 'nullable|date',
             'children.*.gender' => 'nullable|in:male,female,other',
             'children.*.email' => 'nullable|email|distinct|unique:users,email',
-            'children.*.password' => 'nullable|confirmed|min:6', // children[*][password_confirmation]
+            'children.*.password' => 'nullable|confirmed|min:6',
         ]);
-        // Get role ids
-        $parentRoleId = DB::table('roles')->where('name', 'parent')->value('id');
-        $kidRoleId = DB::table('roles')->where('name', 'kid')->value('id'); // افترض وجود دور للأطفال
 
-        // Create Parent User
+        $parentRoleId = DB::table('roles')->where('name', 'parent')->value('id');
+        $kidRoleId = DB::table('roles')->where('name', 'kid')->value('id');
+
+        // إنشاء الوالد
         $parent = User::create([
             'name' => $request->parentName,
             'email' => $request->parentEmail,
@@ -94,28 +93,9 @@ class AuthController extends Controller
             'role_id' => $parentRoleId,
         ]);
 
-        // mail verfiction:link,otp
-        if ($parent) {
-            $otp = mt_rand(100000, 999999); // بتولد ارقام عشوائية مكونة من 6لا خانات
-            $token = Str::random(50); // 50 خانة
-
-            VerfactionEmail::create([
-                'email' => $parent->email,
-                'otp' => $otp,
-                'token' => $token,
-                'expire' => now()->addMinutes(10)->format('Y-m-d H:i:s'),
-            ]);
-
-            $verfactionurl = url('verfactionemail/' . $token);
-            Mail::to($parent->email)->send(new VerfiyEmail($verfactionurl, $otp));
-            flash()->success('Account created successfully. Please verify your email.');
-            return redirect()->route('login');
-        }
-
-        // Create Children Users and Kids records
-        if ($request->has('children')) {
+        // إنشاء الأطفال (إن وجدوا)
+        if ($request->add_child === 'Yes' && $request->has('children')) {
             foreach ($request->children as $child) {
-                // Create Child User
                 $childUser = User::create([
                     'name' => $child['name'],
                     'email' => $child['email'],
@@ -124,25 +104,38 @@ class AuthController extends Controller
                     'role_id' => $kidRoleId,
                 ]);
 
-                // Create Child info in kids table
                 $kid = Kid::create([
                     'user_id' => $childUser->id,
                     'display_name' => $child['name'],
                     'dob' => $child['dob'],
                     'gender' => $child['gender'],
                     'points' => 0,
-                    'created_at' => now(),
-                    'updated_at' => now(),
                 ]);
 
-                // ربط الطفل بالوالد في جدول parent_children
                 $parent->children()->attach($kid->id);
             }
         }
 
-        flash()->success('Parent and children accounts created successfully.');
+        // الآن بعد إنشاء الجميع، نرسل التفعيل
+        if ($parent) {
+            $otp = mt_rand(100000, 999999);
+            $token = Str::random(50);
+
+            VerfactionEmail::create([
+                'email' => $parent->email,
+                'otp' => $otp,
+                'token' => $token,
+                'expire' => now()->addMinutes(10),
+            ]);
+
+            $verfactionurl = url('verfactionemail/' . $token);
+            Mail::to($parent->email)->send(new VerfiyEmail($verfactionurl, $otp));
+        }
+
+        flash()->success('Account created successfully. Please verify your email.');
         return redirect()->route('login');
     }
+
 
 
     public function showForgotForm()

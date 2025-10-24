@@ -59,8 +59,10 @@
                                 <td>{{ $kid->points }}</td>
                                 <td>
                                     @if ($kid->avatar)
-                                        <img src="{{ asset($kid->avatar->image_url) }}" alt="avatar" width="40"
-                                            height="40" class="rounded-circle">
+                                        <img src="{{ asset('storage/' . $kid->avatar->image_url) }}" alt="avatar"
+                                            width="60" height="60" class="rounded-circle">
+                                        {{-- <td><img src="{{ asset('storage/' . $avatar->image_url) }}" width="60"
+                                        height="60" class="rounded-circle object-fit-cover"></td> --}}
                                     @else
                                         <span class="text-muted">No Avatar</span>
                                     @endif
