@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Mail\VerfiyEmail;
+use App\Models\Avatar;
 use App\Models\Kid;
 use App\Models\User;
 use App\Models\VerfactionEmail;
@@ -104,13 +105,19 @@ class AuthController extends Controller
                     'role_id' => $kidRoleId,
                 ]);
 
+                $defaultAvatar = Avatar::whereRaw('LOWER(name) = ?', ['default'])
+                    ->where('is_active', true)
+                    ->first();
+
                 $kid = Kid::create([
                     'user_id' => $childUser->id,
                     'display_name' => $child['name'],
                     'dob' => $child['dob'],
                     'gender' => $child['gender'],
                     'points' => 0,
+                    'avatar_id' => $defaultAvatar ? $defaultAvatar->id : null,
                 ]);
+
 
                 $parent->children()->attach($kid->id);
             }
