@@ -7,10 +7,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\Auth\AuthController;
 use App\Http\Controllers\Api\Auth\VerficationEmailController;
-use App\Http\Controllers\Api\GameController;
+use App\Http\Controllers\Api\Games\GameController;
 use App\Http\Controllers\Api\LessonController;
 use App\Http\Controllers\Api\QuizController;
-use App\Http\Controllers\Api\ProfileController;
+use App\Http\Controllers\Api\Auth\ProfileController;
 use App\Http\Controllers\Api\RewardController;
 use App\Http\Controllers\Api\DailyGoalController;
 use App\Http\Controllers\Api\AchievementController;
@@ -57,6 +57,18 @@ Route::prefix('v1')->group(function () {
     | Protected Routes (Kid / Parent / Admin)
     |--------------------------------------------------------------------------
     */
+    Route::middleware('auth:sanctum')->group(function () {
+        Route::get('/profile', [ProfileController::class, 'getProfile']);
+        Route::put('/profile', [ProfileController::class, 'updateProfile']);
+        Route::post('/change-password', [ProfileController::class, 'changePassword']);
+        Route::delete('/delete-account', [ProfileController::class, 'deleteAccount']);
+
+        // Games
+        Route::get('/games', [GameController::class, 'index']);
+        Route::post('/games/play', [GameController::class, 'play']);
+        Route::get('/games/{game}', [GameController::class, 'show']);
+    });
+
     // Route::middleware('auth:sanctum')->group(function () {
 
     //     // Profile & Settings

@@ -149,8 +149,8 @@
                             @csrf
                             @method('DELETE') <!-- مهم جدًا -->
                             <div class="form-check mb-3">
-                                <input class="form-check-input" type="checkbox" name="accountActivation"
-                                    id="accountActivation" />
+                                <input class="form-check-input" type="checkbox" name="account_activation"
+                                    id="accountActivation" value="1" />
                                 <label class="form-check-label"
                                     for="accountActivation">{{ __('I confirm my account deletion') }}</label>
                             </div>

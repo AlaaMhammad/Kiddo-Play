@@ -1,32 +1,30 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers\Api\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Models\User;
-use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 
-class AdminController extends Controller
+class ProfileController extends Controller
 {
-    public function index()
-    {
-        return view('admin.index');
-    }
-
-    public function profile()
+    public function getProfile()
     {
         $user = Auth::user();
-        return view('admin.account.index', compact('user'));
+
+        return response()->json([
+            'status' => 1,
+            'message' => 'Profile retrieved successfully',
+            'data' => $user,
+        ]);
     }
 
-    public function update(Request $request)
+    public function updateProfile(Request $request)
     {
-        /** @var \App\Models\User $user */
+        /** @var User $user */
         $user = Auth::user();
 
         $validator = Validator::make($request->all(), [
@@ -51,56 +49,42 @@ class AdminController extends Controller
         return response()->json(['status' => 1, 'message' => 'Profile updated successfully', 'data' => $user]);
     }
 
-    public function change_password(Request $request)
+    public function changePassword(Request $request)
     {
         $request->validate([
             'old_password' => 'required',
             'new_password' => 'required|min:8|confirmed',
         ]);
-        /** @var \App\Models\User $user */
+        /** @var User $user */
         $user = Auth::user();
 
         if (!Hash::check($request->old_password, $user->password)) {
-            return redirect()->back()->with('error', 'Wrong current password');
+            return response()->json(['status' => 0, 'message' => 'Wrong current password']);
         }
 
         $user->password = Hash::make($request->new_password);
         $user->save();
 
-        return redirect()->back()->with('success', 'Password changed successfully');
+        return response()->json(['status' => 1, 'message' => 'Password changed successfully']);
     }
 
-
-    // public function delete(Request $request)
-    // {
-    //     /** @var \App\Models\User $user */
-    //     $user = Auth::user();
-
-    //     if (!$user) {
-    //         return response()->json(['status' => 0, 'message' => 'User not found']);
-    //     }
-
-    //     $user->delete();
-
-    //     return response()->json(['status' => 1, 'message' => 'Account deleted successfully']);
-    // }
-
-    public function delete(Request $request)
+    public function deleteAccount(Request $request)
     {
-        $request->validate([
-            'account_activation' => 'accepted', // يجب أن يكون الـ checkbox مؤكد
-        ]);
-
-        /** @var \App\Models\User $user */
+        // $request->validate([
+        //     'account_activation' => 'accepted',
+        // ]);
+        /** @var User $user */
         $user = Auth::user();
 
-        // تسجيل خروج المستخدم
-        Auth::logout();
+        // حذف التوكن الحالي فقط
+        $user->currentAccessToken()->delete();
 
         // حذف الحساب
         $user->delete();
-        flash()->success('Your account has been deleted successfully.');
-        // إعادة توجيه مع رسالة نجاح
-        return redirect('/');
+
+        return response()->json([
+            'status' => 1,
+            'message' => 'Your account has been deleted successfully'
+        ]);
     }
 }
