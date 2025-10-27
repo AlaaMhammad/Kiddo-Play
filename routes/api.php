@@ -1,8 +1,7 @@
 <?php
 
+use App\Http\Controllers\Api\Settings\ParentalController;
 use Illuminate\Http\Request;
-// use Illuminate\Support\Facades\Route;
-
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\Auth\AuthController;
@@ -11,11 +10,11 @@ use App\Http\Controllers\Api\Games\GameController;
 use App\Http\Controllers\Api\LessonController;
 use App\Http\Controllers\Api\QuizController;
 use App\Http\Controllers\Api\Auth\ProfileController;
-use App\Http\Controllers\Api\RewardController;
-use App\Http\Controllers\Api\DailyGoalController;
+use App\Http\Controllers\Api\Rewards\RewardController;
+use App\Http\Controllers\Api\DailyGoals\DailyGoalController;
 use App\Http\Controllers\Api\AchievementController;
-use App\Http\Controllers\Api\NotificationController;
-use App\Http\Controllers\Api\SettingController;
+use App\Http\Controllers\Api\Notifications\NotificationController;
+use App\Http\Controllers\Api\Settings\SettingController;
 use App\Http\Controllers\Api\OtpController;
 
 
@@ -67,6 +66,22 @@ Route::prefix('v1')->group(function () {
         Route::get('/games', [GameController::class, 'index']);
         Route::post('/games/play', [GameController::class, 'play']);
         Route::get('/games/{game}', [GameController::class, 'show']);
+
+        // Daily Goals
+        Route::get('/daily-goals', [DailyGoalController::class, 'index']);
+        Route::post('/daily-goals/{id}/complete', [DailyGoalController::class, 'complete']);
+        // Rewards
+        Route::get('/rewards', [RewardController::class, 'index']);
+        Route::post('/rewards/{id}/claim', [RewardController::class, 'claim']);
+        // Notifications
+        Route::get('/notifications', [NotificationController::class, 'index']);
+        Route::post('/notifications/read', [NotificationController::class, 'markAsRead']);
+        // Settings
+        Route::get('/settings', [SettingController::class, 'index']);
+        Route::put('/settings/update', [SettingController::class, 'update']);
+        // Settings Parental Controls
+        Route::get('/parental-controls', [ParentalController::class, 'index']);
+        Route::put('/parental-controls/{kid}', [ParentalController::class, 'update']);
     });
 
     // Route::middleware('auth:sanctum')->group(function () {
