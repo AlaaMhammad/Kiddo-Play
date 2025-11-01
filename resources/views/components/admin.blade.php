@@ -2,8 +2,8 @@
 
 <html class="layout-navbar-fixed layout-menu-fixed layout-compact" data-skin="default"
     data-assets-path="{{ asset('dashboard/assets') . '/' }}" data-base-url="{{ url('/') }}"
-    data-template="vertical-menu-template" data-bs-theme="light" @if (Session::get('locale') == 'ar') dir="rtl" lang="ar"
-    @endif>
+    data-template="vertical-menu-template" data-bs-theme="light"
+    @if (Session::get('locale') == 'ar') dir="rtl" lang="ar" @endif>
 
 <head>
     <meta charset="utf-8" />
@@ -90,7 +90,7 @@
                 <!-- Navbar -->
 
                 <nav class="layout-navbar container-xxl navbar-detached navbar navbar-expand-xl align-items-center bg-navbar-theme"
-                    id="layout-navbar">
+                    id="layout-navbar" style="z-index: 10 !important">
                     <div class="layout-menu-toggle navbar-nav align-items-xl-center me-4 me-xl-0 d-xl-none">
                         <a class="nav-item nav-link px-0 me-xl-6" href="javascript:void(0)">
                             <i class="icon-base bx bx-menu icon-md"></i>
@@ -118,7 +118,7 @@
                                 </a>
                                 <ul class="dropdown-menu dropdown-menu-end">
                                     <li>
-                                        <a class="dropdown-item" href="{{route('en')}}" data-language="en"
+                                        <a class="dropdown-item" href="{{ route('en') }}" data-language="en"
                                             data-text-direction="ltr">
                                             <span>@lang('menu.english')</span>
                                         </a>
@@ -139,7 +139,7 @@
                                         </a>
                                     </li> --}}
                                     <li>
-                                        <a class="dropdown-item" href="{{route('ar')}}" data-language="ar"
+                                        <a class="dropdown-item" href="{{ route('ar') }}" data-language="ar"
                                             data-text-direction="rtl">
                                             <span>@lang('menu.arabic')</span>
                                         </a>
@@ -285,7 +285,7 @@
                             <!-- Quick links -->
 
                             <!-- Notification -->
-                            <li class="nav-item dropdown-notifications navbar-dropdown dropdown me-3 me-xl-2">
+                            {{-- <li class="nav-item dropdown-notifications navbar-dropdown dropdown me-3 me-xl-2">
                                 <a class="nav-link dropdown-toggle hide-arrow" href="javascript:void(0);"
                                     data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
                                     <span class="position-relative">
@@ -344,6 +344,95 @@
                                         </div>
                                     </li>
                                 </ul>
+                            </li> --}}
+                            <!--/ Notification -->
+                            <!-- Notification -->
+                            <li class="nav-item dropdown-notifications navbar-dropdown dropdown me-3 me-xl-2">
+                                <a class="nav-link dropdown-toggle hide-arrow" href="javascript:void(0);"
+                                    data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
+                                    <span class="position-relative">
+                                        <i class="icon-base bx bx-bell icon-md"></i>
+                                        <span
+                                            class="badge rounded-pill bg-danger badge-dot badge-notifications border"></span>
+                                    </span>
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end p-0">
+                                    <li class="dropdown-menu-header border-bottom">
+                                        <div class="dropdown-header d-flex align-items-center py-3">
+                                            <h6 class="mb-0 me-auto">Notification</h6>
+                                            <div class="d-flex align-items-center h6 mb-0">
+                                                @php
+                                                    $unreadCount = app(
+                                                        App\Http\Controllers\Admin\Notifications\NotificationController::class,
+                                                    )
+                                                        ->dropdownNotifications()
+                                                        ->where('is_read', false)
+                                                        ->count();
+                                                @endphp
+
+                                                <span class="badge bg-label-primary me-2">{{ $unreadCount }}
+                                                    New</span>
+                                                <a href="{{ route('admin.notifications.read') }}"
+                                                    class="dropdown-notifications-all p-2" data-bs-toggle="tooltip"
+                                                    data-bs-placement="top" title="Mark all as read">
+                                                    <i class="icon-base bx bx-envelope-open text-heading"></i>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <li class="dropdown-notifications-list scrollable-container">
+                                        @php
+                                            $dropdownNotifications = app(
+                                                App\Http\Controllers\Admin\Notifications\NotificationController::class,
+                                            )->dropdownNotifications();
+                                        @endphp
+                                        <ul class="list-group list-group-flush">
+                                            @forelse($dropdownNotifications as $notification)
+                                                <li
+                                                    class="list-group-item list-group-item-action dropdown-notifications-item {{ $notification->is_read ? '' : 'unread' }}">
+                                                    <div class="d-flex">
+                                                        <div class="flex-shrink-0 me-3">
+                                                            <div class="avatar">
+                                                                <img src="{{ asset('dashboard/assets/img/avatars/1.png') }}"
+                                                                    alt class="rounded-circle" />
+                                                            </div>
+                                                        </div>
+                                                        <div class="flex-grow-1">
+                                                            <h6 class="small mb-0">
+                                                                {{ $notification->title ?? 'New Notification' }}</h6>
+                                                            <small class="mb-1 d-block text-body">
+                                                                {{ $notification->body }}
+                                                            </small>
+                                                            <small class="text-body-secondary">
+                                                                {{ $notification->sent_at ? $notification->sent_at->diffForHumans() : $notification->created_at->diffForHumans() }}
+                                                            </small>
+                                                        </div>
+                                                        <div class="flex-shrink-0 dropdown-notifications-actions">
+                                                            @if (!$notification->is_read)
+                                                                <a href="{{ route('admin.notifications.read') }}"
+                                                                    class="dropdown-notifications-read">
+                                                                    <span class="badge badge-dot bg-primary"></span>
+                                                                </a>
+                                                            @endif
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                            @empty
+                                                <li class="list-group-item text-center text-muted">
+                                                    No notifications yet.
+                                                </li>
+                                            @endforelse
+                                        </ul>
+                                    </li>
+                                    <li class="border-top">
+                                        <div class="d-grid p-4">
+                                            <a class="btn btn-primary btn-sm d-flex"
+                                                href="{{ route('admin.notifications.index') }}">
+                                                <small class="align-middle">View all notifications</small>
+                                            </a>
+                                        </div>
+                                    </li>
+                                </ul>
                             </li>
                             <!--/ Notification -->
                             <!-- User -->
@@ -361,8 +450,8 @@
                                             <div class="d-flex">
                                                 <div class="flex-shrink-0 me-3">
                                                     <div class="avatar avatar-online">
-                                                        <img src="{{ asset('dashboard/assets/img/avatars/1.png') }}" alt
-                                                            class="w-px-40 h-auto rounded-circle" />
+                                                        <img src="{{ asset('dashboard/assets/img/avatars/1.png') }}"
+                                                            alt class="w-px-40 h-auto rounded-circle" />
                                                     </div>
                                                 </div>
                                                 <div class="flex-grow-1">
@@ -450,7 +539,8 @@
                                         document.write(new Date().getFullYear());
                                     </script>
                                     , made with ❤️ by
-                                    <a href="https://github.com/AlaaMhammad" target="_blank" class="footer-link">ِAlaa
+                                    <a href="https://github.com/AlaaMhammad" target="_blank"
+                                        class="footer-link">ِAlaa
                                         Mhammad</a>
                                 </div>
                                 {{-- <div class="d-none d-lg-inline-block">

@@ -10,39 +10,59 @@ use Illuminate\Support\Facades\Auth;
 
 class NotificationController extends Controller
 {
+    /**
+     * عرض قائمة الإشعارات
+     */
     public function index()
     {
         /** @var User $user */
         $user = Auth::user();
 
-        if ($user->role->name === 'admin') {
-            $notifications = Notification::with('user')->latest()->paginate(10);
-        } elseif ($user->role->name === 'parent') {
-            // الأب يرى إشعاراته وإشعارات أطفاله
-            $kidsIds = $user->children()->pluck('kids.id');
-            $notifications = Notification::whereIn('user_id', $kidsIds->push($user->id))
-                ->with('user')
-                ->latest()
-                ->paginate(10);
-        } elseif ($user->role->name === 'kid') {
-            // الطفل يرى إشعاراته فقط
-            $notifications = Notification::where('user_id', $user->kid?->id)
-                ->with('user')
-                ->latest()
-                ->paginate(10);
-        } else {
-            abort(403, 'Unauthorized');
+        $query = Notification::with('user')->latest();
+
+        switch ($user->role->name) {
+            case 'admin':
+                // المسؤول يرى كل الإشعارات
+                break;
+
+            case 'parent':
+                // الأب يرى إشعاراته وأطفاله
+                $kidsIds = $user->children()->pluck('kids.id')->push($user->id);
+                $query->whereIn('user_id', $kidsIds);
+                break;
+
+            case 'kid':
+                // الطفل يرى إشعاراته فقط
+                $query->where('user_id', $user->kid?->id);
+                break;
+
+            default:
+                abort(403, 'Unauthorized');
         }
+
+        $notifications = $query->paginate(10);
 
         return view('admin.notifications.index', compact('notifications'));
     }
 
+    /**
+     * عرض إشعار واحد
+     */
     public function show(Notification $notification)
     {
         $this->authorizeView($notification);
+
+        // تحديد الإشعار كمقروء عند العرض (تحسين UX)
+        if (!$notification->is_read) {
+            $notification->update(['is_read' => true]);
+        }
+
         return view('admin.notifications.show', compact('notification'));
     }
 
+    /**
+     * إنشاء إشعار جديد
+     */
     public function create()
     {
         $this->authorizeAdmin();
@@ -50,6 +70,9 @@ class NotificationController extends Controller
         return view('admin.notifications.create', compact('users'));
     }
 
+    /**
+     * حفظ إشعار جديد
+     */
     public function store(Request $request)
     {
         $this->authorizeAdmin();
@@ -63,12 +86,18 @@ class NotificationController extends Controller
             'sent_at' => 'nullable|date',
         ]);
 
-        Notification::create($validated);
+        Notification::create($validated + [
+            'sent_at' => $validated['sent_at'] ?? now(),
+        ]);
 
-        return redirect()->route('admin.notifications.index')
-            ->with('success', 'Notification created successfully!');
+        return redirect()
+            ->route('admin.notifications.index')
+            ->with('success', 'Notification created successfully.');
     }
 
+    /**
+     * تعديل إشعار
+     */
     public function edit(Notification $notification)
     {
         $this->authorizeAdmin();
@@ -76,6 +105,9 @@ class NotificationController extends Controller
         return view('admin.notifications.edit', compact('notification', 'users'));
     }
 
+    /**
+     * تحديث إشعار
+     */
     public function update(Request $request, Notification $notification)
     {
         $this->authorizeAdmin();
@@ -91,33 +123,83 @@ class NotificationController extends Controller
 
         $notification->update($validated);
 
-        return redirect()->route('admin.notifications.index')
-            ->with('success', 'Notification updated successfully!');
+        return redirect()
+            ->route('admin.notifications.index')
+            ->with('success', 'Notification updated successfully.');
     }
 
+    /**
+     * حذف إشعار
+     */
     public function destroy(Notification $notification)
     {
         $this->authorizeAdmin();
         $notification->delete();
-        return back()->with('success', 'Notification deleted successfully!');
+
+        return back()->with('success', 'Notification deleted successfully.');
     }
 
-    private function authorizeAdmin()
+    /**
+     * وضع كل الإشعارات كمقروءة
+     */
+    public function markAllAsRead()
     {
-        $user = Auth::user();
-        abort_unless($user && $user->role->name === 'admin', 403, 'Unauthorized action.');
+        Notification::where('is_read', false)->update(['is_read' => true]);
+
+        return redirect()->back()->with('success', 'All notifications marked as read.');
     }
 
-    private function authorizeView(Notification $notification)
+
+    public function dropdownNotifications()
     {
         /** @var User $user */
         $user = Auth::user();
 
-        if ($user->role->name === 'admin') return;
+        $query = Notification::with('user')->latest();
+
+        switch ($user->role->name) {
+            case 'admin':
+                break;
+            case 'parent':
+                $kidsIds = $user->children()->pluck('kids.id')->push($user->id);
+                $query->whereIn('user_id', $kidsIds);
+                break;
+            case 'kid':
+                $query->where('user_id', $user->kid?->id);
+                break;
+            default:
+                abort(403, 'Unauthorized');
+        }
+
+        $notifications = $query->take(5)->get(); // آخر 5 إشعارات فقط
+        return $notifications;
+    }
+
+
+    /**
+     * السماح فقط للمسؤول بالدخول
+     */
+    private function authorizeAdmin(): void
+    {
+        abort_unless(Auth::user()?->role?->name === 'admin', 403, 'Unauthorized action.');
+    }
+
+    /**
+     * التحقق من صلاحية العرض
+     */
+    private function authorizeView(Notification $notification): void
+    {
+        /** @var User $user */
+        $user = Auth::user();
+
+        if ($user->role->name === 'admin') {
+            return;
+        }
 
         if ($user->role->name === 'parent') {
-            $kidsIds = $user->children()->pluck('kids.id');
-            abort_unless(in_array($notification->user_id, $kidsIds->push($user->id)->toArray()), 403, 'Unauthorized access.');
+            $kidsIds = $user->children()->pluck('kids.id')->push($user->id)->toArray();
+            abort_unless(in_array($notification->user_id, $kidsIds), 403, 'Unauthorized access.');
+            return;
         }
 
         if ($user->role->name === 'kid') {

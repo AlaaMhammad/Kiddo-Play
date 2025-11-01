@@ -254,7 +254,11 @@ Route::middleware('isParent')->prefix('admin')->name('admin.')->group(function (
     // Route::resource('purchases', PurchaseController::class)->only(['index', 'show']);
 
     // Notifications & Settings
+    Route::get('notifications/read', [NotificationController::class, 'markAllAsRead'])->name('notifications.read');
     Route::resource('notifications', NotificationController::class);
+
+    // Route::get('/notifications/read/{id}', [NotificationController::class, 'markAllAsRead'])->name('notifications.read');
+
     Route::resource('user-settings', UserSettingController::class);
     Route::resource('parental-controls', ParentalControlController::class);
 });

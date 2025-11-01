@@ -25,7 +25,7 @@ class RewardController extends Controller
         }
 
         // deduct points if necessary
-        PointsTransaction::create([
+        $data = PointsTransaction::create([
             'kid_id' => $kid->id,
             'type' => 'spend',
             'amount' => $reward->points_required,
@@ -41,6 +41,7 @@ class RewardController extends Controller
         return response()->json([
             'status' => 1,
             'message' => 'Reward claimed successfully!',
+            'data' => $data,
         ]);
     }
 }
