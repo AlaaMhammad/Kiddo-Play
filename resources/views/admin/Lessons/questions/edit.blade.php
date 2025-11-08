@@ -19,8 +19,14 @@
                 'match' => 'Match Pairs',
             ]" :selected="$question->type" />
 
-            <x-form.textarea name="options" label="Options (JSON format)" :value="json_encode($question->options)" />
-            <x-form.textarea name="correct_answer" label="Correct Answer (JSON)" :value="json_encode($question->correct_answer)" />
+            {{-- <x-form.textarea name="options" label="Options (JSON format)" :value="json_encode($question->options)" />
+            <x-form.textarea name="correct_answer" label="Correct Answer (JSON)" :value="json_encode($question->correct_answer)" /> --}}
+
+            <x-form.textarea name="options" label="Options (each option on a new line)" :value="implode(PHP_EOL, json_decode($question->options ?? '[]', true))" />
+
+            <x-form.textarea name="correct_answer" label="Correct Answers (each answer on a new line)"
+                :value="implode(PHP_EOL, json_decode($question->correct_answer ?? '[]', true))" />
+
 
             <x-form.input type="number" name="points" label="Points" value="{{ $question->points }}" required />
             <x-form.input type="number" name="order" label="Order" value="{{ $question->order }}" />

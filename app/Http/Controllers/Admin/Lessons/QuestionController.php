@@ -46,6 +46,29 @@ class QuestionController extends Controller
         return view('admin.Lessons.questions.create', compact('quizzes'));
     }
 
+    // public function store(Request $request)
+    // {
+    //     $this->authorizeRole('admin');
+
+    //     $validated = $request->validate([
+    //         'quiz_id' => 'required|exists:quizzes,id',
+    //         'content' => 'required|string',
+    //         'type' => 'required|in:mcq,true_false,fill_blank,match',
+    //         'options' => 'nullable|array',
+    //         'correct_answer' => 'nullable|array',
+    //         'points' => 'required|integer|min:1',
+    //         'order' => 'nullable|integer|min:0',
+    //     ]);
+
+    //     $validated['options'] = $request->options ? json_encode($request->options) : null;
+    //     $validated['correct_answer'] = $request->correct_answer ? json_encode($request->correct_answer) : null;
+
+    //     Question::create($validated);
+
+    //     return redirect()->route('admin.questions.index')->with('success', 'Question created successfully.');
+    // }
+
+
     public function store(Request $request)
     {
         $this->authorizeRole('admin');
@@ -54,18 +77,29 @@ class QuestionController extends Controller
             'quiz_id' => 'required|exists:quizzes,id',
             'content' => 'required|string',
             'type' => 'required|in:mcq,true_false,fill_blank,match',
-            'options' => 'nullable|array',
-            'correct_answer' => 'nullable|array',
+            'options' => 'nullable|string', // ← كانت array، صارت string لأنك تستخدم textarea
+            'correct_answer' => 'nullable|string',
             'points' => 'required|integer|min:1',
             'order' => 'nullable|integer|min:0',
         ]);
 
-        $validated['options'] = $request->options ? json_encode($request->options) : null;
-        $validated['correct_answer'] = $request->correct_answer ? json_encode($request->correct_answer) : null;
+        // ✳️ تحويل النص من textarea إلى مصفوفة
+        $options = $request->filled('options')
+            ? preg_split('/\r\n|\r|\n/', trim($request->options))
+            : null;
+
+        $correct_answer = $request->filled('correct_answer')
+            ? preg_split('/\r\n|\r|\n/', trim($request->correct_answer))
+            : null;
+
+        // ✳️ تخزين كـ JSON في قاعدة البيانات
+        $validated['options'] = $options ? json_encode($options) : null;
+        $validated['correct_answer'] = $correct_answer ? json_encode($correct_answer) : null;
 
         Question::create($validated);
 
-        return redirect()->route('admin.questions.index')->with('success', 'Question created successfully.');
+        flash()->success('Question created successfully.');
+        return redirect()->route('admin.questions.index');
     }
 
     public function edit(Question $question)
@@ -75,6 +109,29 @@ class QuestionController extends Controller
         return view('admin.Lessons.questions.edit', compact('question', 'quizzes'));
     }
 
+    // public function update(Request $request, Question $question)
+    // {
+    //     $this->authorizeRole('admin');
+
+    //     $validated = $request->validate([
+    //         'quiz_id' => 'required|exists:quizzes,id',
+    //         'content' => 'required|string',
+    //         'type' => 'required|in:mcq,true_false,fill_blank,match',
+    //         'options' => 'nullable|array',
+    //         'correct_answer' => 'nullable|array',
+    //         'points' => 'required|integer|min:1',
+    //         'order' => 'nullable|integer|min:0',
+    //     ]);
+
+    //     $validated['options'] = $request->options ? json_encode($request->options) : null;
+    //     $validated['correct_answer'] = $request->correct_answer ? json_encode($request->correct_answer) : null;
+
+    //     $question->update($validated);
+
+    //     return redirect()->route('admin.questions.index')->with('success', 'Question updated successfully.');
+    // }
+
+
     public function update(Request $request, Question $question)
     {
         $this->authorizeRole('admin');
@@ -83,18 +140,29 @@ class QuestionController extends Controller
             'quiz_id' => 'required|exists:quizzes,id',
             'content' => 'required|string',
             'type' => 'required|in:mcq,true_false,fill_blank,match',
-            'options' => 'nullable|array',
-            'correct_answer' => 'nullable|array',
+            'options' => 'nullable|string', // ← كانت array، أصبحت string
+            'correct_answer' => 'nullable|string',
             'points' => 'required|integer|min:1',
             'order' => 'nullable|integer|min:0',
         ]);
 
-        $validated['options'] = $request->options ? json_encode($request->options) : null;
-        $validated['correct_answer'] = $request->correct_answer ? json_encode($request->correct_answer) : null;
+        // ✳️ تحويل النص من textarea إلى array (كل سطر = عنصر)
+        $options = $request->filled('options')
+            ? preg_split('/\r\n|\r|\n/', trim($request->options))
+            : null;
+
+        $correct_answer = $request->filled('correct_answer')
+            ? preg_split('/\r\n|\r|\n/', trim($request->correct_answer))
+            : null;
+
+        // ✳️ تخزين كـ JSON في قاعدة البيانات
+        $validated['options'] = $options ? json_encode($options) : null;
+        $validated['correct_answer'] = $correct_answer ? json_encode($correct_answer) : null;
 
         $question->update($validated);
 
-        return redirect()->route('admin.questions.index')->with('success', 'Question updated successfully.');
+        flash()->success('Question updated successfully.');
+        return redirect()->route('admin.questions.index');
     }
 
     public function destroy(Question $question)

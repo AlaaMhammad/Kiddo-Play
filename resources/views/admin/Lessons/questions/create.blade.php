@@ -18,8 +18,10 @@
                 'match' => 'Match Pairs',
             ]" required placeholder="Select Question Type" />
 
-            <x-form.textarea name="options" label="Options (JSON format)" placeholder='e.g. ["A","B","C"]' />
-            <x-form.textarea name="correct_answer" label="Correct Answer (JSON)" placeholder='e.g. ["A"]' />
+            {{-- <x-form.textarea name="options" label="Options (JSON format)" placeholder='e.g. ["A","B","C"]' /> --}}
+            <x-form.textarea name="options" label="Options (JSON format)" placeholder="Option 1&#10;Option 2&#10;Option 3"/>
+            {{-- <x-form.textarea name="correct_answer" label="Correct Answer (JSON)" placeholder='e.g. ["A"]' /> --}}
+            <x-form.textarea name="correct_answer" label="Correct Answer (JSON)" placeholder="Option 1" />
 
             <x-form.input type="number" name="points" label="Points" required min="1" value="1" />
             <x-form.input type="number" name="order" label="Order" value="0" />

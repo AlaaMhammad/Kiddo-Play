@@ -15,7 +15,7 @@
         <p><strong>Content:</strong></p>
         <div class="border rounded p-2 bg-light">{!! nl2br(e($question->content)) !!}</div>
 
-        @if ($question->options)
+        {{-- @if ($question->options)
             <hr>
             <p><strong>Options:</strong></p>
             <pre>{{ json_encode($question->options, JSON_PRETTY_PRINT) }}</pre>
@@ -24,6 +24,17 @@
         @if ($question->correct_answer)
             <p><strong>Correct Answer:</strong></p>
             <pre>{{ json_encode($question->correct_answer, JSON_PRETTY_PRINT) }}</pre>
+        @endif --}}
+
+        @if ($question->options)
+            <hr>
+            <p><strong>Options:</strong></p>
+            <pre>{{ json_encode(json_decode($question->options, true), JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) }}</pre>
+        @endif
+
+        @if ($question->correct_answer)
+            <p><strong>Correct Answer:</strong></p>
+            <pre>{{ json_encode(json_decode($question->correct_answer, true), JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) }}</pre>
         @endif
 
         <p class="text-muted mt-3 small">Created: {{ $question->created_at->format('Y-m-d H:i') }}</p>
