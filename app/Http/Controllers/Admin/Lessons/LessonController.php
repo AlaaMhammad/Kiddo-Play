@@ -40,7 +40,49 @@ class LessonController extends Controller
             abort(403, 'You do not have access to this lesson.');
         }
 
-        return view('admin.Lessons.lesson.show', compact('lesson'));
+        $content = $lesson->content;
+
+        // فصل المحتوى إلى أسطر
+        $lines = preg_split('/\r\n|\r|\n/', $content);
+
+        $iconWidth = 32;
+        $visualLines = [];
+
+        // مصفوفة الأيقونات الدائرية
+        $icons = [
+            'icons/icon1.png',
+            'icons/icon2.png',
+            'icons/icon3.png',
+            'icons/icon4.png',
+            'icons/icon5.png',
+            'icons/icon6.png',
+            'icons/icon7.png',
+        ];
+        $iconsCount = count($icons);
+
+        foreach ($lines as $index => $line) {
+            // اختيار أيقونة السطر الحالي بشكل دائري
+            $numberIcon = $icons[$index % $iconsCount];
+
+            preg_match_all('/\d+|\+|\-|\*|=/', $line, $matches);
+            $elements = $matches[0];
+
+            $visual = '';
+            foreach ($elements as $el) {
+                if (is_numeric($el)) {
+                    // تكرار أيقونة السطر حسب قيمة الرقم
+                    for ($i = 0; $i < intval($el); $i++) {
+                        $visual .= '<img src="' . asset($numberIcon) . '" style="width:' . $iconWidth . 'px; margin:2px;">';
+                    }
+                } else {
+                    $visual .= ' ' . $el . ' ';
+                }
+            }
+
+            $visualLines[] = $visual;
+        }
+
+        return view('admin.Lessons.lesson.show', compact('lesson', 'content', 'visualLines'));
     }
 
     /**

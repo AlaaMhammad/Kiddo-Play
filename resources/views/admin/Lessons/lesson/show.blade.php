@@ -20,11 +20,31 @@
             <p>{{ $lesson->summary }}</p>
         @endif
 
+        {{-- @if ($lesson->content)
+            <hr>
+            <h6>Visual Representation:</h6>
+            <div style="font-size:24px; line-height:36px;">{!! $visual !!}</div>
+
+            <h6 class="mt-3">Original Content:</h6>
+            <p>{!! nl2br(e($lesson->content)) !!}</p>
+        @endif --}}
+
         @if ($lesson->content)
             <hr>
-            <h6>Content:</h6>
-            <p>{!! nl2br(e($lesson->content)) !!}</p>
+            <h6>Visual Representation:</h6>
+            @php
+                $lines = explode("\n", $lesson->content);
+            @endphp
+            @foreach ($visualLines as $index => $line)
+                <div style="margin-bottom:20px;">
+                    <div>{!! $line !!}</div> {{-- أيقونات السطر --}}
+                    <div style="margin-top:5px; font-weight:bold;">{{ $lines[$index] }}</div> {{-- نص السطر الأصلي --}}
+                </div>
+            @endforeach
         @endif
+
+
+
 
         @if ($lesson->media_url)
             <hr>
