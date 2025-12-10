@@ -24,33 +24,49 @@
             {{-- <x-form.textarea name="content" label="Content" rows="5" value="{{ $lesson->content }}" /> --}}
 
             @php
-                $lines = explode("\n", old('content', $lesson->content ?? ''));
+                // raw محتوى الداتا القادمة
+                $rawContent = old('content', $lesson->content ?? '');
+
+                // إذا كان Array (من الفورم)، استخدمه كما هو
+                // إذا كان نص من قاعدة البيانات → حوله لأسطر باستخدام explode
+                $lines = is_array($rawContent) ? $rawContent : explode("\n", $rawContent);
+
+                // الأيقونات المختارة
                 $lineIcons = old('line_icons', $lesson->line_icons ?? []);
+
+                // مسار الملفات
                 $iconFiles = glob(public_path('icons/*.png'));
             @endphp
 
-            @foreach ($lines as $index => $line)
-                <div class="mb-3">
-                    <label>Line {{ $index + 1 }}</label>
-                    <input type="text" name="content[]" value="{{ $line }}" class="form-control mb-1">
+            <div id="lines-container">
+                @foreach ($lines as $index => $line)
+                    <div class="mb-3 line-item">
+                        <label>Line {{ $index + 1 }}</label>
+                        <input type="text" name="content[]" value="{{ $line }}" class="form-control mb-1">
 
-                    <div class="d-flex flex-wrap gap-2">
-                        @foreach ($iconFiles as $file)
-                            @php
-                                $iconUrl = str_replace(public_path(), '', $file);
-                                $iconUrl = asset($iconUrl);
-                            @endphp
-                            <label style="cursor:pointer; display:inline-block;">
-                                <input type="radio" name="line_icons[{{ $index }}]" value="{{ $iconUrl }}"
-                                    {{ isset($lineIcons[$index]) && $lineIcons[$index] == $iconUrl ? 'checked' : '' }}
-                                    style="display:none;">
-                                <img src="{{ $iconUrl }}"
-                                    style="width:40px; height:40px; border:1px solid #ccc; padding:2px;">
-                            </label>
-                        @endforeach
+                        <div class="d-flex flex-wrap gap-2 icon-options">
+                            @foreach ($iconFiles as $file)
+                                @php
+                                    $relativePath = str_replace(public_path() . DIRECTORY_SEPARATOR, '', $file);
+                                    $relativePath = str_replace('\\', '/', $relativePath);
+                                    $iconUrl = asset($relativePath);
+                                @endphp
+
+                                <label class="icon-label"
+                                    style="cursor:pointer; display:inline-block; border:1px solid #ccc; padding:2px;">
+                                    <input type="radio" name="line_icons[{{ $index }}]"
+                                        value="{{ $iconUrl }}"
+                                        {{ isset($lineIcons[$index]) && $lineIcons[$index] == $iconUrl ? 'checked' : '' }}
+                                        style="display:none;">
+                                    <img src="{{ $iconUrl }}" style="width:40px; height:40px;">
+                                </label>
+                            @endforeach
+                        </div>
                     </div>
-                </div>
-            @endforeach
+                @endforeach
+            </div>
+
+            <button type="button" id="add-line" class="btn btn-sm btn-secondary mb-3">+ Add Line</button>
 
             <x-form.input name="media_url" label="Media URL" value="{{ $lesson->media_url }}" />
 
