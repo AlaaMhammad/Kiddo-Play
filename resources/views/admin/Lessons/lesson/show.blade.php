@@ -29,7 +29,7 @@
             <p>{!! nl2br(e($lesson->content)) !!}</p>
         @endif --}}
 
-        @if ($lesson->content)
+        {{-- @if ($lesson->content)
             <hr>
             <h6>Visual Representation:</h6>
             @php
@@ -37,11 +37,25 @@
             @endphp
             @foreach ($visualLines as $index => $line)
                 <div style="margin-bottom:20px;">
-                    <div>{!! $line !!}</div> {{-- أيقونات السطر --}}
-                    <div style="margin-top:5px; font-weight:bold;">{{ $lines[$index] }}</div> {{-- نص السطر الأصلي --}}
+                    <div>{!! $line !!}</div> {{-- أيقونات السطر
+                    <div style="margin-top:5px; font-weight:bold;">{{ $lines[$index] }}</div>  نص السطر الأصلي
+                </div>
+            @endforeach
+        @endif --}}
+
+        @if ($lesson->content)
+            <hr>
+            <h6>Visual Representation:</h6>
+
+            @foreach ($visualLines as $index => $line)
+                <div style="margin-bottom:20px;">
+                    <div>{!! $line !!}</div> {{-- السطر الأساسي بأيقونة السطر --}}
+                    <div style="margin-top:5px; font-weight:bold;">{!! $textAsIcons[$index] !!}</div>
+                    {{-- السطر الأصلي لكن بأيقونات --}}
                 </div>
             @endforeach
         @endif
+
 
 
 

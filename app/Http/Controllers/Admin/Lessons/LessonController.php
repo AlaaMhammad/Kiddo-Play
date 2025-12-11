@@ -32,6 +32,7 @@ class LessonController extends Controller
     /**
      * عرض تفاصيل درس معين
      */
+
     public function show(Lesson $lesson)
     {
         $user = Auth::user();
@@ -45,36 +46,104 @@ class LessonController extends Controller
 
         $lineIcons = json_decode($lesson->line_icons, true) ?? [];
 
-
+        // أيقونات الأرقام والعمليات
+        $elementIcons = [
+            "0" => "icons/0.png",
+            "1" => "icons/1.png",
+            "2" => "icons/2.png",
+            "3" => "icons/3.png",
+            "4" => "icons/4.png",
+            "5" => "icons/5.png",
+            "6" => "icons/6.png",
+            "7" => "icons/7.png",
+            "8" => "icons/8.png",
+            "9" => "icons/9.png",
+            "+" => "icons/plus.svg",
+            "-" => "icons/minus.svg",
+            "*" => "icons/multiply.svg",
+            "=" => "icons/equal.svg",
+        ];
 
         $iconWidth = 32;
         $visualLines = [];
+        $textAsIcons = [];
 
         foreach ($lines as $index => $line) {
-            // أيقونة السطر الحالي
             $lineIcon = $lineIcons[$index] ?? null;
 
             preg_match_all('/\d+|\+|\-|\*|=/', $line, $matches);
             $elements = $matches[0];
 
             $visual = '';
+            $converted = '';
+
             foreach ($elements as $el) {
+
+                // السطر الأول: تكرار أيقونة السطر حسب الرقم
                 if (is_numeric($el) && $lineIcon) {
-                    // تكرار الأيقونة حسب قيمة الرقم
                     for ($i = 0; $i < intval($el); $i++) {
                         $visual .= '<img src="' . asset($lineIcon) . '" style="width:' . $iconWidth . 'px; margin:2px;">';
                     }
                 } else {
-                    // علامات + - * = تبقى كما هي
-                    $visual .= ' ' . $el . ' ';
+                    $visual .= '<img src="' . asset($elementIcons[$el]) . '" style="width:' . $iconWidth . 'px; margin:2px;">';
+                }
+
+                // السطر الثاني: رقم → صورة واحدة فقط
+                if (isset($elementIcons[$el])) {
+                    $converted .= '<img src="' . asset($elementIcons[$el]) . '" style="width:' . $iconWidth . 'px; margin:2px;">';
                 }
             }
 
             $visualLines[] = $visual;
+            $textAsIcons[] = $converted;
         }
 
-        return view('admin.Lessons.lesson.show', compact('lesson', 'content', 'visualLines'));
+        return view('admin.Lessons.lesson.show', compact('lesson', 'content', 'visualLines', 'textAsIcons'));
     }
+
+    // public function show(Lesson $lesson)
+    // {
+    //     $user = Auth::user();
+
+    //     if ($user->role->name !== 'admin' && !$lesson->is_published) {
+    //         abort(403, 'You do not have access to this lesson.');
+    //     }
+
+    //     $content = $lesson->content;
+    //     $lines = preg_split('/\r\n|\r|\n/', $content);
+
+    //     $lineIcons = json_decode($lesson->line_icons, true) ?? [];
+
+
+
+    //     $iconWidth = 32;
+    //     $visualLines = [];
+
+    //     foreach ($lines as $index => $line) {
+    //         // أيقونة السطر الحالي
+    //         $lineIcon = $lineIcons[$index] ?? null;
+
+    //         preg_match_all('/\d+|\+|\-|\*|=/', $line, $matches);
+    //         $elements = $matches[0];
+
+    //         $visual = '';
+    //         foreach ($elements as $el) {
+    //             if (is_numeric($el) && $lineIcon) {
+    //                 // تكرار الأيقونة حسب قيمة الرقم
+    //                 for ($i = 0; $i < intval($el); $i++) {
+    //                     $visual .= '<img src="' . asset($lineIcon) . '" style="width:' . $iconWidth . 'px; margin:2px;">';
+    //                 }
+    //             } else {
+    //                 // علامات + - * = تبقى كما هي
+    //                 $visual .= ' ' . $el . ' ';
+    //             }
+    //         }
+
+    //         $visualLines[] = $visual;
+    //     }
+
+    //     return view('admin.Lessons.lesson.show', compact('lesson', 'content', 'visualLines'));
+    // }
 
 
     /**
