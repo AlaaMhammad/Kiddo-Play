@@ -41,40 +41,31 @@ class LessonController extends Controller
         }
 
         $content = $lesson->content;
-
-        // فصل المحتوى إلى أسطر
         $lines = preg_split('/\r\n|\r|\n/', $content);
+
+        $lineIcons = json_decode($lesson->line_icons, true) ?? [];
+
+
 
         $iconWidth = 32;
         $visualLines = [];
 
-        // مصفوفة الأيقونات الدائرية
-        $icons = [
-            'icons/icon1.png',
-            'icons/icon2.png',
-            'icons/icon3.png',
-            'icons/icon4.png',
-            'icons/icon5.png',
-            'icons/icon6.png',
-            'icons/icon7.png',
-        ];
-        $iconsCount = count($icons);
-
         foreach ($lines as $index => $line) {
-            // اختيار أيقونة السطر الحالي بشكل دائري
-            $numberIcon = $icons[$index % $iconsCount];
+            // أيقونة السطر الحالي
+            $lineIcon = $lineIcons[$index] ?? null;
 
             preg_match_all('/\d+|\+|\-|\*|=/', $line, $matches);
             $elements = $matches[0];
 
             $visual = '';
             foreach ($elements as $el) {
-                if (is_numeric($el)) {
-                    // تكرار أيقونة السطر حسب قيمة الرقم
+                if (is_numeric($el) && $lineIcon) {
+                    // تكرار الأيقونة حسب قيمة الرقم
                     for ($i = 0; $i < intval($el); $i++) {
-                        $visual .= '<img src="' . asset($numberIcon) . '" style="width:' . $iconWidth . 'px; margin:2px;">';
+                        $visual .= '<img src="' . asset($lineIcon) . '" style="width:' . $iconWidth . 'px; margin:2px;">';
                     }
                 } else {
+                    // علامات + - * = تبقى كما هي
                     $visual .= ' ' . $el . ' ';
                 }
             }
@@ -84,6 +75,7 @@ class LessonController extends Controller
 
         return view('admin.Lessons.lesson.show', compact('lesson', 'content', 'visualLines'));
     }
+
 
     /**
      * إنشاء درس جديد (للأدمن فقط)
@@ -104,6 +96,8 @@ class LessonController extends Controller
             'summary'      => 'nullable|string',
             'content'      => 'nullable|array',
             'content.*'    => 'nullable|string',
+            'line_icons' => 'nullable|array',
+            'line_icons.*' => 'nullable|string',
             'media_url'    => 'nullable|string|max:255',
             'order'        => 'nullable|integer|min:0',
             'is_published' => 'boolean',
@@ -111,7 +105,7 @@ class LessonController extends Controller
 
         // دمج الـ content[] في نص واحد مفصول بسطر جديد
         $validated['content'] = implode("\n", $request->input('content', []));
-
+        $validated['line_icons'] = json_encode($request->input('line_icons', []));
 
         Lesson::create($validated);
         return redirect()->route('admin.lessons.index')
@@ -131,60 +125,28 @@ class LessonController extends Controller
     {
         $this->authorizeAdmin();
 
-        // $validated = $request->validate([
-        //     'category' => 'required|in:numbers,letters,animals,arithmetic',
-        //     'title' => 'required|string|max:255',
-        //     'summary' => 'nullable|string',
-        //     'content' => 'nullable|string',
-        //     'media_url' => 'nullable|string|max:255',
-        //     'order' => 'nullable|integer|min:0',
-        //     'is_published' => 'boolean',
-        // ]);
-
         $validated = $request->validate([
             'category'     => 'required|in:numbers,letters,animals,arithmetic',
             'title'        => 'required|string|max:255',
             'summary'      => 'nullable|string',
-            'content'      => 'nullable|string',
-            'media_url'    => 'nullable|string|max:255', // هذا يُخزن في DB
+            'content'      => 'nullable|array',
+            'content.*'    => 'nullable|string',
+            'line_icons' => 'nullable|array',
+            'line_icons.*' => 'nullable|string',
+            'media_url'    => 'nullable|string|max:255',
             'order'        => 'nullable|integer|min:0',
             'is_published' => 'boolean',
         ]);
+
+        // دمج الـ content[] في نص واحد مفصول بسطر جديد
+        $validated['content'] = implode("\n", $request->input('content', []));
+        $validated['line_icons'] = json_encode($request->input('line_icons', []));
 
         $lesson->update($validated);
 
         return redirect()->route('admin.lessons.index')
             ->with('success', 'Lesson updated successfully.');
     }
-
-
-
-    // public function update(Request $request, Lesson $lesson)
-    // {
-    //     $this->authorizeAdmin();
-
-    //     $validated = $request->validate([
-    //         'category' => 'required|in:numbers,letters,animals,arithmetic',
-    //         'title' => 'required|string|max:255',
-    //         'summary' => 'nullable|string',
-    //         'content' => 'required|array',       // مصفوفة أسطر
-    //         'line_icons' => 'nullable|array',    // أيقونات لكل سطر
-    //         'media_url' => 'nullable|string|max:255',
-    //         'order' => 'nullable|integer|min:0',
-    //         'is_published' => 'boolean',
-    //     ]);
-
-    //     // دمج الأسطر في نص واحد لحفظه في العمود content
-    //     $validated['content'] = implode("\n", $validated['content']);
-
-    //     // تخزين أيقونات السطر في العمود line_icons بصيغة JSON
-    //     $validated['line_icons'] = json_encode($validated['line_icons'] ?? []);
-
-    //     $lesson->update($validated);
-
-    //     return redirect()->route('admin.lessons.index')
-    //         ->with('success', 'Lesson updated successfully.');
-    // }
 
     /**
      * حذف درس (للأدمن فقط)
