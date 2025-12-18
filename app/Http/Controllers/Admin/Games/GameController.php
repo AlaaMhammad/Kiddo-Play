@@ -91,11 +91,15 @@ class GameController extends Controller
         $this->authorizeRole('admin');
 
         $data = $request->validate([
-            'description' => 'nullable|string',
-            'category' => 'required|in:educational,fun,mixed',
+            'title'            => 'required|string|max:255',
+            'description'      => 'nullable|string',
+            'category'         => 'required|in:educational,fun,mixed',
             'difficulty_level' => 'required|in:easy,medium,hard',
-            'media_url' => 'nullable|url',
-            'is_active' => 'sometimes|boolean',
+            'game_url'         => 'required|url',
+            'media_url'        => 'nullable|url',
+            'required_points'  => 'required|integer|min:0',
+            'entry_cost'       => 'required|integer|min:0',
+            'is_active'        => 'sometimes|boolean',
         ]);
 
         $data['is_active'] = $request->has('is_active');
@@ -104,7 +108,7 @@ class GameController extends Controller
 
         return redirect()->route('admin.games.index')->with([
             'success' => 'Game created successfully.',
-            'action' => 'create',
+            'action'  => 'create',
         ]);
     }
 
@@ -122,19 +126,24 @@ class GameController extends Controller
         $this->authorizeRole('admin');
 
         $data = $request->validate([
-            'description' => 'nullable|string',
-            'category' => 'required|in:educational,fun,mixed',
+            'title'            => 'required|string|max:255',
+            'description'      => 'nullable|string',
+            'category'         => 'required|in:educational,fun,mixed',
             'difficulty_level' => 'required|in:easy,medium,hard',
-            'media_url' => 'nullable|url',
-            'is_active' => 'sometimes|boolean',
+            'game_url'         => 'required|url',
+            'media_url'        => 'nullable|url',
+            'required_points'  => 'required|integer|min:0',
+            'entry_cost'       => 'required|integer|min:0',
+            'is_active'        => 'sometimes|boolean',
         ]);
 
         $data['is_active'] = $request->has('is_active');
+
         $game->update($data);
 
         return redirect()->route('admin.games.index')->with([
             'success' => 'Game updated successfully.',
-            'action' => 'update',
+            'action'  => 'update',
         ]);
     }
 
