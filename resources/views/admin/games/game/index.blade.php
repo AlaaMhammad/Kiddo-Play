@@ -38,9 +38,12 @@
                 <thead>
                     <tr>
                         <th>#</th>
+                        <th>Title</th>
                         <th>Description</th>
                         <th>Category</th>
                         <th>Difficulty</th>
+                        <th>Required Points</th>
+                        <th>Entry Cost</th>
                         <th>Active</th>
                         <th class="text-center">Actions</th>
                     </tr>
@@ -49,9 +52,12 @@
                     @forelse($games as $game)
                         <tr>
                             <td>{{ $games->firstItem() + $loop->index }}</td>
+                            <td>{{ $game->title }}</td>
                             <td>{{ $game->description }}</td>
                             <td>{{ ucfirst($game->category) }}</td>
                             <td>{{ ucfirst($game->difficulty_level) }}</td>
+                            <td>{{ $game->required_points }}</td>
+                            <td>{{ $game->entry_cost }}</td>
                             <td>
                                 @if ($game->is_active)
                                     <span class="badge bg-success">Yes</span>
@@ -81,7 +87,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="text-center">No games found.</td>
+                            <td colspan="9" class="text-center">No games found.</td>
                         </tr>
                     @endforelse
                 </tbody>
