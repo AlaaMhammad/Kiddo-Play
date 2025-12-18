@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\DailyGoals;
 
 use App\Http\Controllers\Controller;
 use App\Models\DailyGoal;
+use App\Models\User;
 use App\Services\DailyGoalService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -13,23 +14,42 @@ class DailyGoalController extends Controller
 
     public function index()
     {
+        /**  @var User $user */
         $user = Auth::user();
         $today = now()->toDateString();
 
-        // ✅ استدعاء Service لإنشاء أهداف اليوم إذا لم توجد
         DailyGoalService::generateForToday();
 
-        // جلب أهداف اليوم للطفل
-        $goals = DailyGoal::where('kid_id', $user->id)
-            ->whereDate('goal_date', $today)
-            ->get();
+        if ($user->role->name === 'kid') {
+            $kidId = $user->kid?->id;
+            $goals = DailyGoal::where('kid_id', $kidId)
+                ->whereDate('goal_date', $today)
+                ->get();
+        } elseif ($user->role->name === 'parent') {
+            $kidsIds = $user->children()->pluck('kids.id');
+            $goals = DailyGoal::whereIn('kid_id', $kidsIds)
+                ->whereDate('goal_date', $today)
+                ->get();
+        } else {
+            $goals = collect();
+        }
 
         return response()->json(['status' => 1, 'data' => $goals]);
     }
 
     public function progress(Request $request, $id)
     {
+        /**  @var User $user */
+        $user = Auth::user();
         $goal = DailyGoal::findOrFail($id);
+
+        // ✅ تحقق من أن المستخدم له حق الوصول (طفل أو والد أو أدمن)
+        if ($user->role->name === 'kid' && $goal->kid_id !== $user->kid?->id) {
+            abort(403, 'Unauthorized');
+        }
+        if ($user->role->name === 'parent' && !in_array($goal->kid_id, $user->children()->pluck('kids.id')->toArray())) {
+            abort(403, 'Unauthorized');
+        }
 
         if (!$goal->is_completed) {
             $goal->increment('progress');
@@ -49,7 +69,18 @@ class DailyGoalController extends Controller
 
     public function complete($id)
     {
+        /**  @var User $user */
+        $user = Auth::user();
         $goal = DailyGoal::findOrFail($id);
+
+        // ✅ تحقق من الوصول
+        if ($user->role->name === 'kid' && $goal->kid_id !== $user->kid?->id) {
+            abort(403, 'Unauthorized');
+        }
+        if ($user->role->name === 'parent' && !in_array($goal->kid_id, $user->children()->pluck('kids.id')->toArray())) {
+            abort(403, 'Unauthorized');
+        }
+
         $goal->update(['is_completed' => true]);
 
         return response()->json([
