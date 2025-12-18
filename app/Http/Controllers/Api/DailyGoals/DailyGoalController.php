@@ -16,25 +16,36 @@ class DailyGoalController extends Controller
     {
         /**  @var User $user */
         $user = Auth::user();
-        $today = now()->toDateString();
 
+        // ✅ إنشاء أهداف اليوم تلقائيًا إذا لم توجد
         DailyGoalService::generateForToday();
 
-        if ($user->role->name === 'kid') {
-            $kidId = $user->kid?->id;
-            $goals = DailyGoal::where('kid_id', $kidId)
+        // جلب أهداف اليوم حسب دور المستخدم
+        $today = now()->toDateString();
+
+        if ($user->role->name === 'admin') {
+            $dailyGoals = DailyGoal::with(['kid', 'game'])
                 ->whereDate('goal_date', $today)
+                ->orderBy('goal_date', 'desc')
                 ->get();
         } elseif ($user->role->name === 'parent') {
             $kidsIds = $user->children()->pluck('kids.id');
-            $goals = DailyGoal::whereIn('kid_id', $kidsIds)
+            $dailyGoals = DailyGoal::with(['kid', 'game'])
+                ->whereIn('kid_id', $kidsIds)
                 ->whereDate('goal_date', $today)
+                ->orderBy('goal_date', 'desc')
+                ->get();
+        } elseif ($user->role->name === 'kid') {
+            $dailyGoals = DailyGoal::with(['kid', 'game'])
+                ->where('kid_id', $user->kid->id)
+                ->whereDate('goal_date', $today)
+                ->orderBy('goal_date', 'desc')
                 ->get();
         } else {
-            $goals = collect();
+            return response()->json(['status' => 0, 'message' => 'Unauthorized'], 403);
         }
 
-        return response()->json(['status' => 1, 'data' => $goals]);
+        return response()->json(['status' => 1, 'data' => $dailyGoals]);
     }
 
     public function progress(Request $request, $id)
