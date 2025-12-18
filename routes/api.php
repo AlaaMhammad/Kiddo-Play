@@ -101,6 +101,7 @@ Route::prefix('v1')->group(function () {
         // 🎯 Daily Goals & Rewards
         Route::get('/daily-goals', [DailyGoalController::class, 'index']);
         Route::post('/daily-goals/{id}/complete', [DailyGoalController::class, 'complete']);
+        Route::post('/daily-goals/{id}/progress', [DailyGoalController::class, 'progress']);
         Route::get('/rewards', [RewardController::class, 'index']);
         Route::post('/rewards/{id}/claim', [RewardController::class, 'claim']);
 
