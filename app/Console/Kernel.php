@@ -21,7 +21,7 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         // Job لإنشاء Daily Goals عند منتصف الليل
-        $schedule->job(new GenerateDailyGoalsJob)->dailyAt('00:00');
+        $schedule->job(new GenerateDailyGoalsJob)->daily();
 
         // مثال: يمكنك إضافة أوامر أخرى
         // $schedule->command('some:command')->hourly();
