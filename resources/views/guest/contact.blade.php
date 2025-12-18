@@ -7,9 +7,7 @@
     <div class="row justify-content-center">
         <div class="col-md-6">
             <div class="card p-4">
-                <form action="#" method="POST">
-                    @csrf
-
+                <form action="mailto:kiddoplay2025@gmail.com" method="GET" enctype="text/plain">
                     <div class="mb-3">
                         <label for="name" class="form-label fw-semibold">Your Name</label>
                         <input type="text" id="name" name="name" class="form-control"
@@ -35,7 +33,7 @@
     </div>
 
     <div class="text-center mt-5">
-        <p class="text-muted mb-1"><i class='bx bx-envelope'></i> support@kiddoplay.com</p>
+        <p class="text-muted mb-1"><i class='bx bx-envelope'></i> kiddoplay2025@gmail.com</p>
         <p class="text-muted"><i class='bx bx-phone'></i> +1 (800) 555-PLAY</p>
     </div>
 </x-guest>
