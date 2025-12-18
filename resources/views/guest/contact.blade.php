@@ -33,12 +33,7 @@
     </div>
 
     <div class="text-center mt-5">
-        <p class="text-muted mb-1 d-flex align-items-center">
-            <i class='bx bx-envelope me-2'></i>
-            <a href="mailto:kiddoplay2025@gmail.com" class="text-decoration-none text-primary">
-                kiddoplay2025@gmail.com
-            </a>
-        </p>
-        <p class="text-muted d-flex align-items-center"><i class='bx bx-phone me-2'></i> +1 (800) 555-PLAY</p>
+        <p class="text-muted mb-1"><i class='bx bx-envelope'></i> <a href="mailto:kiddoplay2025@gmail.com" class="text-white">kiddoplay2025@gmail.com</a></p>
+        <p class="text-muted"><i class='bx bx-phone'></i> +1 (800) 555-PLAY</p>
     </div>
 </x-guest>
