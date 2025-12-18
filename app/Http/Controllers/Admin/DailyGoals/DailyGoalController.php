@@ -71,6 +71,8 @@ class DailyGoalController extends Controller
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
             'target_points' => 'nullable|integer|min:0',
+            'progress' => 'nullable|integer|min:0',  // الجديد
+            'type' => 'nullable|string|in:game,word,quiz', // الجديد
             'is_completed' => 'nullable|boolean',
             'goal_date' => 'required|date',
         ]);
@@ -102,6 +104,8 @@ class DailyGoalController extends Controller
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
             'target_points' => 'nullable|integer|min:0',
+            'progress' => 'nullable|integer|min:0',  // الجديد
+            'type' => 'nullable|string|in:game,word,quiz', // الجديد
             'is_completed' => 'nullable|boolean',
             'goal_date' => 'required|date',
         ]);

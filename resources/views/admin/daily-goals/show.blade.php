@@ -9,6 +9,7 @@
     <div class="card mb-4">
         <div class="card-header">
             <h5 class="mb-0">{{ $dailyGoal->title }}</h5>
+            <h5 class="mb-0">{{ ucfirst($dailyGoal->type ?? '-') }}</h5>
         </div>
         <div class="card-body">
             <table class="table table-borderless">
@@ -28,6 +29,22 @@
                     <tr>
                         <th>Target Points</th>
                         <td>{{ $dailyGoal->target_points }}</td>
+                    </tr>
+                    <tr>
+                        <th>Progress</th>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <div class="progress flex-grow-1 me-2" style="height: 20px;">
+                                    <div class="progress-bar" role="progressbar"
+                                        style="width: {{ $dailyGoal->target_points > 0 ? ($dailyGoal->progress / $dailyGoal->target_points) * 100 : 0 }}%"
+                                        aria-valuenow="{{ $dailyGoal->progress }}" aria-valuemin="0"
+                                        aria-valuemax="{{ $dailyGoal->target_points }}">
+                                        {{ $dailyGoal->progress }}/{{ $dailyGoal->target_points }}
+                                    </div>
+                                </div>
+                                <span>{{ $dailyGoal->target_points > 0 ? round(($dailyGoal->progress / $dailyGoal->target_points) * 100) : 0 }}%</span>
+                            </div>
+                        </td>
                     </tr>
                     <tr>
                         <th>Completed</th>

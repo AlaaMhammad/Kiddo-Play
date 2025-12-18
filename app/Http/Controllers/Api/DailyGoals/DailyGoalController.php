@@ -12,11 +12,77 @@ class DailyGoalController extends Controller
     public function index()
     {
         $user = Auth::user();
+        $today = now()->toDateString();
+
+        // التحقق إذا الأهداف موجودة
         $goals = DailyGoal::where('kid_id', $user->id)
-            ->whereDate('goal_date', now())
+            ->whereDate('goal_date', $today)
             ->get();
 
+        if ($goals->isEmpty()) {
+            // إنشاء الأهداف اليومية تلقائيًا
+            $goalsData = [
+                [
+                    'kid_id' => $user->id,
+                    'title' => 'Play One Game',
+                    'type' => 'game',
+                    'target_points' => 1,
+                    'progress' => 0,
+                    'goal_date' => $today,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ],
+                [
+                    'kid_id' => $user->id,
+                    'title' => 'Learn New Word',
+                    'type' => 'word',
+                    'target_points' => 1,
+                    'progress' => 0,
+                    'goal_date' => $today,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ],
+                [
+                    'kid_id' => $user->id,
+                    'title' => 'Finish One Quiz',
+                    'type' => 'quiz',
+                    'target_points' => 1,
+                    'progress' => 0,
+                    'goal_date' => $today,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ],
+            ];
+
+            DailyGoal::insert($goalsData);
+
+            $goals = DailyGoal::where('kid_id', $user->id)
+                ->whereDate('goal_date', $today)
+                ->get();
+        }
+
         return response()->json(['status' => 1, 'data' => $goals]);
+    }
+
+
+    public function progress(Request $request, $id)
+    {
+        $goal = DailyGoal::findOrFail($id);
+
+        if (!$goal->is_completed) {
+            $goal->increment('progress');
+
+            if ($goal->progress >= $goal->target_points) {
+                $goal->is_completed = true;
+                $goal->save();
+            }
+        }
+
+        return response()->json([
+            'status' => 1,
+            'message' => 'Progress updated!',
+            'data' => $goal
+        ]);
     }
 
     public function complete($id)

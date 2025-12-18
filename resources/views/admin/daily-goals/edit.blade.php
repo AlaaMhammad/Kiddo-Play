@@ -18,9 +18,13 @@
 
             <x-form.input name="title" label="Title" :value="$dailyGoal->title" required />
 
+            <x-form.select name="type" label="Goal Type" :options="['game' => 'Game', 'word' => 'Word', 'quiz' => 'Quiz']" :selected="$dailyGoal->type" />
+
             <x-form.textarea name="description" label="Description" :value="$dailyGoal->description" />
 
             <x-form.number name="target_points" label="Target Points" :value="$dailyGoal->target_points ?? 0" />
+
+            <x-form.input type="number" name="progress" label="Progress" :value="$dailyGoal->progress" />
 
             <x-form.checkbox name="is_completed" label="Completed" :checked="$dailyGoal->is_completed" />
 

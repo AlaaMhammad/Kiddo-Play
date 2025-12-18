@@ -16,10 +16,13 @@
             <x-form.select name="game_id" label="Game" :options="$games" placeholder="-- None --" />
 
             <x-form.input name="title" label="Title" required />
+            <x-form.select name="type" label="Goal Type" :options="['game' => 'Game', 'word' => 'Word', 'quiz' => 'Quiz']" />
 
             <x-form.textarea name="description" label="Description" />
 
             <x-form.number name="target_points" label="Target Points" value="0" />
+            <x-form.input type="number" name="progress" label="Progress" value="0" />
+
 
             <x-form.checkbox name="is_completed" label="Completed" />
 
