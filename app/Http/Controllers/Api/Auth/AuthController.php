@@ -42,14 +42,14 @@ class AuthController extends Controller
         }
 
         // إذا عنده توكنات نشطة، نرجع رسالة بدون بيانات المستخدم
-        if ($user->tokens()->exists()) {
-            return response()->json([
-                'message' => 'User already logged in',
-                'token' => $user->tokens()->latest()->first()->plainTextToken ?? null
-            ]);
-        }
+        // if ($user->tokens()->exists()) {
+        //     return response()->json([
+        //         'message' => 'User already logged in',
+        //         'token' => $user->tokens()->latest()->first()->plainTextToken ?? null
+        //     ]);
+        // }
 
-        // $user->tokens()->delete(); // حذف التوكنات السابقة
+        $user->tokens()->delete(); // حذف التوكنات السابقة
 
         // إنشاء توكن جديد
         $token = $user->createToken('auth_token')->plainTextToken;

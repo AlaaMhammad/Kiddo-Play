@@ -23,11 +23,7 @@ class GameController extends Controller
             $games = Game::withCount('kids')->latest()->paginate(15);
         } elseif ($user->role->name === 'parent') {
             // الأب يرى فقط الألعاب التي لعبها أطفاله
-            $kidsIds = $user->children()->pluck('kids.id');
-            $games = Game::whereHas('kids', fn($q) => $q->whereIn('kids.id', $kidsIds))
-                ->withCount('kids')
-                ->latest()
-                ->paginate(15);
+             $games = Game::withCount('kids')->latest()->paginate(15);
         } elseif ($user->role->name === 'kid') {
             // الطفل يرى الألعاب النشطة فقط
             $games = Game::where('is_active', true)->latest()->paginate(15);

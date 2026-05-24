@@ -21,11 +21,7 @@ class GameController extends Controller
         if ($user->role->name === 'admin') {
             $games = Game::withCount('kids')->latest()->get();
         } elseif ($user->role->name === 'parent') {
-            $kidsIds = $user->children()->pluck('kids.id');
-            $games = Game::whereHas('kids', fn($q) => $q->whereIn('kids.id', $kidsIds))
-                ->withCount('kids')
-                ->latest()
-                ->get();
+            $games = Game::withCount('kids')->latest()->paginate(15);
         } elseif ($user->role->name === 'kid') {
             $games = Game::where('is_active', true)->latest()->get()->map(function ($game) use ($user) {
                 return [
