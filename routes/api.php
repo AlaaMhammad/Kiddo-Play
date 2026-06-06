@@ -62,7 +62,7 @@ Route::prefix('v1')->group(function () {
     */
     Route::middleware('auth:sanctum')->group(function () {
 
-        // 👤 Profile
+        //  Profile
         Route::prefix('profile')->group(function () {
             Route::get('/', [ProfileController::class, 'getProfile']);
             Route::put('/', [ProfileController::class, 'updateProfile']);
@@ -70,14 +70,14 @@ Route::prefix('v1')->group(function () {
             Route::delete('/delete-account', [ProfileController::class, 'deleteAccount']);
         });
 
-        // 🎮 Games
+        //  Games
         Route::prefix('games')->group(function () {
             Route::get('/', [GameController::class, 'index']);
             Route::post('/play', [GameController::class, 'play']);
             Route::get('/{game}', [GameController::class, 'show']);
         });
 
-        // 📘 Lessons & Quizzes
+        //  Lessons & Quizzes
         Route::prefix('lessons')->group(function () {
             Route::get('/', [LessonController::class, 'index']);
             Route::get('/{id}', [LessonController::class, 'show']);
@@ -92,29 +92,29 @@ Route::prefix('v1')->group(function () {
             Route::get('/attempts', [QuizController::class, 'attempts']);
         });
 
-        // 🏆 Achievements
+        //  Achievements
         Route::prefix('achievements')->group(function () {
             Route::get('/', [AchievementController::class, 'index']);
             Route::get('/my', [AchievementController::class, 'myAchievements']);
         });
 
-        // 🎯 Daily Goals & Rewards
+        //  Daily Goals & Rewards
         Route::get('/daily-goals', [DailyGoalController::class, 'index']);
         Route::post('/daily-goals/{id}/complete', [DailyGoalController::class, 'complete']);
         Route::post('/daily-goals/{id}/progress', [DailyGoalController::class, 'progress']);
         Route::get('/rewards', [RewardController::class, 'index']);
         Route::post('/rewards/{id}/claim', [RewardController::class, 'claim']);
 
-        // 🪙 Points & Store
+        //  Points & Store
         Route::get('/points', [PointsController::class, 'index']);
         Route::get('/store', [StoreController::class, 'index']);
         Route::post('/store/{id}/purchase', [StoreController::class, 'purchase']);
 
-        // 🔔 Notifications
+        //  Notifications
         Route::get('/notifications', [NotificationController::class, 'index']);
         Route::post('/notifications/read', [NotificationController::class, 'markAsRead']);
 
-        // ⚙️ Settings & Parental Controls
+        //  Settings & Parental Controls
         Route::get('/settings', [SettingController::class, 'index']);
         Route::put('/settings', [SettingController::class, 'update']);
         Route::get('/parental-controls', [ParentalController::class, 'index']);
@@ -153,17 +153,17 @@ Route::prefix('v1')->group(function () {
         // Route::get('/rewards', [RewardController::class, 'index']);
         // Route::post('/rewards/{id}/claim', [RewardController::class, 'claim']);
 
-        // // 🪙 النقاط
+        // //  النقاط
         // Route::get('/points', [PointsController::class, 'index']);
 
-        // // 🎓 تقدم الدروس
+        // //  تقدم الدروس
         // Route::post('/lessons/progress', [LessonProgressController::class, 'update']);
 
-        // // 🏆 الإنجازات
+        // //  الإنجازات
         // Route::get('/achievements', [AchievementController::class, 'index']);
         // Route::get('/achievements/my', [AchievementController::class, 'myAchievements']);
 
-        // // 🏪 المتجر
+        // //  المتجر
         // Route::get('/store', [StoreController::class, 'index']);
         // Route::post('/store/{id}/purchase', [StoreController::class, 'purchase']);
 
