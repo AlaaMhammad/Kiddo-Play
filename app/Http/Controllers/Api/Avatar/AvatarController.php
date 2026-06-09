@@ -54,7 +54,7 @@ class AvatarController extends Controller
                     [
                         'id' => 0,
                         'name' => 'Default Avatar',
-                        'image_url' => asset('images/default-avatar.png'),
+                        'image_url' => asset('storage/' . 'avatars/NxNiPSbpXrTRl1Tg1m9OZetv0p4btIMPqhJJb831.png'),
                         'is_default' => true,
                         'is_selected' => true,
                     ]
@@ -67,7 +67,7 @@ class AvatarController extends Controller
                 return [
                     'id' => $avatar->id,
                     'name' => $avatar->name,
-                    'image_url' => asset('images/' . $avatar->image_url),
+                    'image_url' => asset('storage/' . $avatar->image_url),
                     'is_selected' => (int)$kid->avatar_id === $avatar->id,
                 ];
             })
