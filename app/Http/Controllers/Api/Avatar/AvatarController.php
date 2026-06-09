@@ -54,7 +54,7 @@ class AvatarController extends Controller
                     [
                         'id' => 0,
                         'name' => 'Default Avatar',
-                        'image_url' => asset('storage/' . 'NxNiPSbpXrTRl1Tg1m9OZetv0p4btIMPqhJJb831.png'),
+                        'image_url' => asset('images/default-avatar.png'),
                         'is_default' => true,
                         'is_selected' => true,
                     ]
