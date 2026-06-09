@@ -13,7 +13,7 @@ class AvatarController extends Controller
      */
     public function index()
     {
-        $kid = Auth::user()->kidProfile;
+        $kid = Auth::user()->kid;
 
         $avatars = Avatar::where('is_active', true)
             ->latest()
@@ -45,7 +45,7 @@ class AvatarController extends Controller
      */
     public function owned()
     {
-        $kid = Auth::user()?->kidProfile;
+        $kid = Auth::user()?->kid;
 
         // ❌ لا ترجع error أبداً
         if (!$kid) {
@@ -79,7 +79,7 @@ class AvatarController extends Controller
      */
     public function buy(Avatar $avatar)
     {
-        $kid = Auth::user()->kidProfile;
+        $kid = Auth::user()->kid;
 
         if (!$kid) {
             return response()->json(['message' => 'Only kids can buy avatars'], 403);
@@ -127,10 +127,18 @@ class AvatarController extends Controller
      */
     public function select(Avatar $avatar)
     {
-        $kid = Auth::user()->kidProfile;
+        $user = Auth::user();
+
+        if (!$user) {
+            return response()->json(['message' => 'Unauthenticated'], 401);
+        }
+
+        $kid = $user->kid;
 
         if (!$kid) {
-            return response()->json(['message' => 'Kid not found'], 404);
+            return response()->json([
+                'message' => 'This user has no kid profile attached'
+            ], 404);
         }
 
         $owned = $kid->avatars()->where('avatar_id', $avatar->id)->exists();
