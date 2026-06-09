@@ -121,13 +121,14 @@ Route::prefix('v1')->group(function () {
         Route::put('/settings', [SettingController::class, 'update']);
         Route::get('/parental-controls', [ParentalController::class, 'index']);
         Route::put('/parental-controls/{kid}', [ParentalController::class, 'update']);
-    });
 
-    Route::prefix('avatars')->group(function () {
-        Route::get('/', [AvatarController::class, 'index']);
-        Route::get('/owned', [AvatarController::class, 'owned']);
-        Route::post('/{avatar}/buy', [AvatarController::class, 'buy']);
-        Route::post('/{avatar}/select', [AvatarController::class, 'select']);
+        // Avatar Shop
+        Route::prefix('avatars')->group(function () {
+            Route::get('/', [AvatarController::class, 'index']);
+            Route::get('/owned', [AvatarController::class, 'owned']);
+            Route::post('/{avatar}/buy', [AvatarController::class, 'buy']);
+            Route::post('/{avatar}/select', [AvatarController::class, 'select']);
+        });
     });
 });
 
