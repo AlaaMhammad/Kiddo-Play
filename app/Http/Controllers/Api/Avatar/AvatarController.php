@@ -45,18 +45,30 @@ class AvatarController extends Controller
      */
     public function owned()
     {
-        $kid = Auth::user()->kidProfile;
+        $kid = Auth::user()?->kidProfile;
 
+        // ❌ لا ترجع error أبداً
         if (!$kid) {
-            return response()->json(['message' => 'Kid not found'], 404);
+            return response()->json([
+                'data' => [
+                    [
+                        'id' => 0,
+                        'name' => 'Default Avatar',
+                        'image_url' => asset('images/default-avatar.png'),
+                        'is_default' => true,
+                        'is_selected' => true,
+                    ]
+                ]
+            ]);
         }
 
         return response()->json([
-            'data' => $kid->avatars->map(function ($avatar) {
+            'data' => $kid->avatars->map(function ($avatar) use ($kid) {
                 return [
                     'id' => $avatar->id,
                     'name' => $avatar->name,
                     'image_url' => asset('storage/' . $avatar->image_url),
+                    'is_selected' => (int)$kid->avatar_id === $avatar->id,
                 ];
             })
         ]);
