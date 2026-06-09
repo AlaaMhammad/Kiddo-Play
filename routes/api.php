@@ -14,6 +14,7 @@ use App\Http\Controllers\Api\Games\GameController;
 use App\Http\Controllers\Api\Lessons\LessonController;
 use App\Http\Controllers\Api\Lessons\QuizController;
 use App\Http\Controllers\Api\Auth\ProfileController;
+use App\Http\Controllers\Api\Avatar\AvatarController;
 use App\Http\Controllers\Api\Rewards\RewardController;
 use App\Http\Controllers\Api\DailyGoals\DailyGoalController;
 // use App\Http\Controllers\Api\AchievementController;
@@ -77,6 +78,7 @@ Route::prefix('v1')->group(function () {
             Route::get('/{game}', [GameController::class, 'show']);
         });
 
+
         //  Lessons & Quizzes
         Route::prefix('lessons')->group(function () {
             Route::get('/', [LessonController::class, 'index']);
@@ -119,6 +121,13 @@ Route::prefix('v1')->group(function () {
         Route::put('/settings', [SettingController::class, 'update']);
         Route::get('/parental-controls', [ParentalController::class, 'index']);
         Route::put('/parental-controls/{kid}', [ParentalController::class, 'update']);
+    });
+
+    Route::prefix('avatars')->group(function () {
+        Route::get('/', [AvatarController::class, 'index']);
+        Route::get('/owned', [AvatarController::class, 'owned']);
+        Route::post('/{avatar}/buy', [AvatarController::class, 'buy']);
+        Route::post('/{avatar}/select', [AvatarController::class, 'select']);
     });
 });
 

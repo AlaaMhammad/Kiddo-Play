@@ -76,4 +76,9 @@ class Kid extends Model
     {
         return $this->hasMany(DailyGoal::class);
     }
+
+    public function avatars()
+    {
+        return $this->belongsToMany(Avatar::class, 'kid_avatars');
+    }
 }

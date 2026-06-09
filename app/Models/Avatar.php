@@ -14,4 +14,5 @@ class Avatar extends Model
     {
         return $this->hasMany(Kid::class);
     }
+    
 }
