@@ -53,6 +53,11 @@ class User extends Authenticatable
         return $this->hasOne(Kid::class);
     }
 
+    public function kidProfile()
+    {
+        return $this->hasOne(Kid::class, 'user_id');
+    }
+
     public function userSetting()
     {
         return $this->hasOne(UserSetting::class);

@@ -54,7 +54,7 @@ class AvatarController extends Controller
             ], 401);
         }
 
-        $kid = $user->kid;
+        $kid = $user->kidProfile;
 
         // لو ما في kid → رجّع default
         if (!$kid) {
