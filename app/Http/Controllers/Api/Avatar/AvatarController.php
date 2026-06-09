@@ -45,9 +45,18 @@ class AvatarController extends Controller
      */
     public function owned()
     {
-        $kid = Auth::user()?->kid;
+        $user = Auth::user();
 
-        // ❌ لا ترجع error أبداً
+        // لو ما في user أصلاً
+        if (!$user) {
+            return response()->json([
+                'data' => []
+            ], 401);
+        }
+
+        $kid = $user->kid;
+
+        // لو ما في kid → رجّع default
         if (!$kid) {
             return response()->json([
                 'data' => [
@@ -62,15 +71,21 @@ class AvatarController extends Controller
             ]);
         }
 
+        // مهم جداً: تأكد العلاقة محمّلة
+        $kid->load('avatars');
+
         return response()->json([
             'data' => $kid->avatars->map(function ($avatar) use ($kid) {
                 return [
                     'id' => $avatar->id,
                     'name' => $avatar->name,
-                    'image_url' => asset('storage/' . $avatar->image_url),
+
+                    // images (مش storage)
+                    'image_url' => asset('images/' . $avatar->image_url),
+
                     'is_selected' => (int)$kid->avatar_id === $avatar->id,
                 ];
-            })
+            })->values()
         ]);
     }
 
