@@ -67,7 +67,7 @@ class AvatarController extends Controller
                 return [
                     'id' => $avatar->id,
                     'name' => $avatar->name,
-                    'image_url' => asset('storage/' . $avatar->image_url),
+                    'image_url' => asset('images/' . $avatar->image_url),
                     'is_selected' => (int)$kid->avatar_id === $avatar->id,
                 ];
             })
