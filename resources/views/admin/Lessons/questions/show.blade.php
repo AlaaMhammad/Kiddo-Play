@@ -37,6 +37,7 @@
             <pre>{{ json_encode(json_decode($question->correct_answer, true), JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) }}</pre>
         @endif
 
+        {{-- @dd($question->correct_answer); --}}
         <p class="text-muted mt-3 small">Created: {{ $question->created_at->format('Y-m-d H:i') }}</p>
     </div>
 </x-admin>
