@@ -51,8 +51,8 @@ class QuizController extends Controller
                         'operator' => $matches[2] ?? null,
                         'second' => $matches[3] ?? null,
 
-                        // الإجابة الصحيحة 
-                        'correct_answer' => $q->correct_answer[0] ?? null,
+                        // الإجابة الصحيحة
+                        'correct_answer' => $q->correct_answer[1] ?? null,
 
                         // خيارات الإجابة
                         'options' => $q->options,
