@@ -9,7 +9,6 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 
-/// ⛔⛔⛔ يحتاج تعديل⛔⛔⛔
 
 class QuizController extends Controller
 {
@@ -27,10 +26,42 @@ class QuizController extends Controller
     public function show($id)
     {
         $quiz = Quiz::with(['questions' => function ($q) {
-            $q->select('id', 'quiz_id', 'content', 'type', 'options', 'points', 'order');
+            $q->orderBy('order');
         }])->findOrFail($id);
 
-        return response()->json(['status' => 1, 'data' => $quiz]);
+        return response()->json([
+            'status' => 1,
+            'data' => [
+                'id' => $quiz->id,
+                'lesson_id' => $quiz->lesson_id,
+                'title' => $quiz->title,
+                'time_limit_seconds' => $quiz->time_limit_seconds,
+                'is_active' => $quiz->is_active,
+
+                'questions' => $quiz->questions->values()->map(function ($q, $index) {
+
+                    // تفكيك العملية الحسابية
+                    preg_match('/(\d+)\s*([\+\-\*\/])\s*(\d+)/', $q->content, $matches);
+
+                    return [
+                        'id' => $q->id,
+                        'number' => $index + 1,
+
+                        'first' => $matches[1] ?? null,
+                        'operator' => $matches[2] ?? null,
+                        'second' => $matches[3] ?? null,
+
+                        // الإجابة الصحيحة 
+                        'correct_answer' => $q->correct_answer[0] ?? null,
+
+                        // خيارات الإجابة
+                        'options' => $q->options,
+
+                        'points' => $q->points,
+                    ];
+                }),
+            ]
+        ]);
     }
 
     // POST /quizzes/{id}/start
@@ -65,7 +96,7 @@ class QuizController extends Controller
         if ($user->role->name !== 'kid') {
             return response()->json(['message' => 'Only kids can submit answers'], 403);
         }
-        /** @var \App\Models\Quiz $quiz */
+        /** @var Quiz $quiz */
         $quiz = Quiz::with('questions')->findOrFail($id);
         $attempt = QuizAttempt::where('quiz_id', $quiz->id)
             ->where('kid_id', $user->id)

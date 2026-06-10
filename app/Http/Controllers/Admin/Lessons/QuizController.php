@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin\Lessons;
 use App\Http\Controllers\Controller;
 use App\Models\Quiz;
 use App\Models\Lesson;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
