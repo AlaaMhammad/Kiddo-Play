@@ -26,7 +26,7 @@ class QuizController extends Controller
     }
 
     // =========================
-    // GET quiz with questions
+    // SHOW QUIZ
     // =========================
     public function show($id)
     {
@@ -50,13 +50,12 @@ class QuizController extends Controller
                     return [
                         'id' => $q->id,
                         'number' => $index + 1,
-
                         'first' => $m[1] ?? null,
                         'operator' => $m[2] ?? null,
                         'second' => $m[3] ?? null,
 
-                        'correct_answer' => $q->correct_answer,
-                        'options' => $q->options,
+                        'correct_answer' => json_decode($q->correct_answer, true) ?? [],
+                        'options' => json_decode($q->options, true) ?? [],
 
                         'points' => $q->points,
                     ];
@@ -105,13 +104,12 @@ class QuizController extends Controller
                     'name' => $kid->display_name,
                 ],
                 'started_at' => $attempt->started_at,
-                'status' => $attempt->status,
             ]
         ]);
     }
 
     // =========================
-    // SUBMIT ATTEMPT
+    // SUBMIT ATTEMPT (FIXED)
     // =========================
     public function submitAttempt(Request $request, $id)
     {
@@ -143,9 +141,16 @@ class QuizController extends Controller
 
         $score = 0;
         $correct = 0;
-        $total = $quiz->questions->count();
+        $total = $quiz->questions()->count();
 
-        DB::transaction(function () use ($validated, $attempt, $quiz, &$score, &$correct) {
+        DB::transaction(function () use (
+            $validated,
+            $attempt,
+            $quiz,
+            &$score,
+            &$correct,
+            $total
+        ) {
 
             foreach ($validated['answers'] as $item) {
 
@@ -157,7 +162,7 @@ class QuizController extends Controller
 
                 $correctAnswers = array_map(
                     fn($v) => trim((string) $v),
-                    (array) $question->correct_answer
+                    json_decode($question->correct_answer, true) ?? []
                 );
 
                 $isCorrect = in_array($userAnswer, $correctAnswers);
@@ -185,7 +190,7 @@ class QuizController extends Controller
                 'finished_at' => now(),
                 'meta' => [
                     'correct' => $correct,
-                    'total' => $quiz->questions->count(),
+                    'total' => $total,
                 ],
             ]);
         });
@@ -229,19 +234,15 @@ class QuizController extends Controller
 
                 return [
                     'quiz_attempt_id' => $attempt->id,
-
                     'quiz' => [
                         'id' => $attempt->quiz?->id,
                         'title' => $attempt->quiz?->title,
                     ],
-
                     'score' => $attempt->score,
                     'status' => $attempt->status,
-
                     'correct_answers' => $attempt->meta['correct'] ?? 0,
                     'total_questions' => $attempt->meta['total'] ?? 0,
                     'wrong_answers' => ($attempt->meta['total'] ?? 0) - ($attempt->meta['correct'] ?? 0),
-
                     'started_at' => $attempt->started_at,
                     'finished_at' => $attempt->finished_at,
                 ];
