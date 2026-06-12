@@ -63,6 +63,7 @@ class QuizController extends Controller
             ]
         ]);
     }
+
     // POST /quizzes/{id}/start
     public function startAttempt($id)
     {
@@ -93,12 +94,18 @@ class QuizController extends Controller
 
         return response()->json([
             'status' => 1,
-            'message' => 'Quiz attempt started',
+            'message' => 'Quiz attempt started successfully',
             'data' => [
-                'attempt_id' => $attempt->id,
-                'quiz_id' => $quiz->id,
-                'quiz_title' => $quiz->title,
-                'kid_id' => $kid->id,
+                'quiz_attempt_id' => $attempt->id,
+                'quiz' => [
+                    'id' => $quiz->id,
+                    'title' => $quiz->title,
+                ],
+                'kid' => [
+                    'id' => $kid->id,
+                    'name' => $kid->name,
+                ],
+                'attempt_status' => $attempt->status,
                 'started_at' => $attempt->started_at,
             ]
         ]);
@@ -124,6 +131,7 @@ class QuizController extends Controller
             ], 404);
         }
 
+        /** @var Quiz $quiz */
         $quiz = Quiz::with('questions')->findOrFail($id);
 
         $attempt = QuizAttempt::where('quiz_id', $quiz->id)
@@ -140,7 +148,7 @@ class QuizController extends Controller
 
         $score = 0;
         $correct = 0;
-        $answersData = [];
+        $totalQuestions = $quiz->questions->count();
 
         DB::transaction(function () use (
             $validated,
@@ -148,9 +156,8 @@ class QuizController extends Controller
             $quiz,
             &$score,
             &$correct,
-            &$answersData
+            $totalQuestions
         ) {
-
             foreach ($validated['answers'] as $item) {
 
                 $question = $quiz->questions
@@ -174,7 +181,8 @@ class QuizController extends Controller
                     );
                 } else {
                     $isCorrect =
-                        strtolower(trim($item['answer'])) ==
+                        strtolower(trim($item['answer']))
+                        ==
                         strtolower(trim($question->correct_answer[0] ?? ''));
                 }
 
@@ -191,15 +199,6 @@ class QuizController extends Controller
                     'is_correct' => $isCorrect,
                     'points_awarded' => $points,
                 ]);
-
-                $answersData[] = [
-                    'question_id' => $question->id,
-                    'question' => $question->content,
-                    'your_answer' => $item['answer'],
-                    'correct_answer' => $question->correct_answer,
-                    'is_correct' => $isCorrect,
-                    'points_awarded' => $points,
-                ];
             }
 
             $attempt->update([
@@ -208,7 +207,7 @@ class QuizController extends Controller
                 'finished_at' => now(),
                 'meta' => [
                     'correct' => $correct,
-                    'total' => count($quiz->questions)
+                    'total' => $totalQuestions,
                 ],
             ]);
         });
@@ -217,14 +216,17 @@ class QuizController extends Controller
             'status' => 1,
             'message' => 'Quiz submitted successfully',
             'data' => [
-                'attempt_id' => $attempt->id,
-                'quiz_id' => $quiz->id,
-                'quiz_title' => $quiz->title,
-                'score' => $score,
-                'correct' => $correct,
-                'total' => count($quiz->questions),
-                'answers' => $answersData,
-            ]
+                'quiz' => [
+                    'id' => $quiz->id,
+                    'title' => $quiz->title,
+                ],
+                'result' => [
+                    'score' => $score,
+                    'correct_answers' => $correct,
+                    'total_questions' => $totalQuestions,
+                    'wrong_answers' => $totalQuestions - $correct,
+                ],
+            ],
         ]);
     }
 
@@ -249,21 +251,36 @@ class QuizController extends Controller
             ->map(function ($attempt) {
 
                 return [
-                    'attempt_id' => $attempt->id,
-                    'quiz_id' => $attempt->quiz_id,
-                    'quiz_title' => $attempt->quiz?->title,
+                    'quiz_attempt_id' => $attempt->id,
+
+                    'quiz' => [
+                        'id' => $attempt->quiz?->id,
+                        'title' => $attempt->quiz?->title,
+                    ],
+
                     'score' => $attempt->score,
+
                     'status' => $attempt->status,
+
+                    'correct_answers' =>
+                    $attempt->meta['correct'] ?? 0,
+
+                    'total_questions' =>
+                    $attempt->meta['total'] ?? 0,
+
+                    'wrong_answers' => ($attempt->meta['total'] ?? 0)
+                        -
+                        ($attempt->meta['correct'] ?? 0),
+
                     'started_at' => $attempt->started_at,
+
                     'finished_at' => $attempt->finished_at,
-                    'correct_answers' => $attempt->meta['correct'] ?? 0,
-                    'total_questions' => $attempt->meta['total'] ?? 0,
                 ];
             });
 
         return response()->json([
             'status' => 1,
-            'data' => $attempts
+            'data' => $attempts,
         ]);
     }
 }
