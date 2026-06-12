@@ -103,7 +103,7 @@ class QuizController extends Controller
                 ],
                 'kid' => [
                     'id' => $kid->id,
-                    'name' => $kid->name,
+                    'name' => $kid->display_name,
                 ],
                 'attempt_status' => $attempt->status,
                 'started_at' => $attempt->started_at,
