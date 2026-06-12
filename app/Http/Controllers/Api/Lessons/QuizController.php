@@ -63,7 +63,6 @@ class QuizController extends Controller
             ]
         ]);
     }
-
     // POST /quizzes/{id}/start
     public function startAttempt($id)
     {
@@ -96,23 +95,39 @@ class QuizController extends Controller
             'status' => 1,
             'message' => 'Quiz attempt started',
             'data' => [
-                'attempt_id' => $attempt->id
+                'attempt_id' => $attempt->id,
+                'quiz_id' => $quiz->id,
+                'quiz_title' => $quiz->title,
+                'kid_id' => $kid->id,
+                'started_at' => $attempt->started_at,
             ]
         ]);
     }
 
+
     // POST /quizzes/{id}/submit
     public function submitAttempt(Request $request, $id)
     {
-        /** @var \App\Models\User $user */
         $user = Auth::user();
+
         if ($user->role->name !== 'kid') {
-            return response()->json(['message' => 'Only kids can submit answers'], 403);
+            return response()->json([
+                'message' => 'Only kids can submit answers'
+            ], 403);
         }
-        /** @var Quiz $quiz */
+
+        $kid = $user->kid;
+
+        if (!$kid) {
+            return response()->json([
+                'message' => 'Kid profile not found'
+            ], 404);
+        }
+
         $quiz = Quiz::with('questions')->findOrFail($id);
+
         $attempt = QuizAttempt::where('quiz_id', $quiz->id)
-            ->where('kid_id', $user->id)
+            ->where('kid_id', $kid->id)
             ->where('status', 'started')
             ->latest()
             ->firstOrFail();
@@ -125,21 +140,42 @@ class QuizController extends Controller
 
         $score = 0;
         $correct = 0;
+        $answersData = [];
 
-        DB::transaction(function () use ($validated, $attempt, $quiz, &$score, &$correct) {
+        DB::transaction(function () use (
+            $validated,
+            $attempt,
+            $quiz,
+            &$score,
+            &$correct,
+            &$answersData
+        ) {
+
             foreach ($validated['answers'] as $item) {
-                $question = $quiz->questions->where('id', $item['question_id'])->first();
-                if (!$question) continue;
+
+                $question = $quiz->questions
+                    ->where('id', $item['question_id'])
+                    ->first();
+
+                if (!$question) {
+                    continue;
+                }
 
                 $isCorrect = false;
                 $points = 0;
 
-                // مقارنة الإجابة
-                if ($question->type === 'mcq' || $question->type === 'true_false') {
-                    $isCorrect = in_array($item['answer'], (array)$question->correct_answer);
+                if (
+                    $question->type === 'mcq' ||
+                    $question->type === 'true_false'
+                ) {
+                    $isCorrect = in_array(
+                        $item['answer'],
+                        (array) $question->correct_answer
+                    );
                 } else {
-                    // يمكنك توسيع المنطق للأنواع الأخرى لاحقاً
-                    $isCorrect = strtolower(trim($item['answer'])) == strtolower(trim($question->correct_answer[0] ?? ''));
+                    $isCorrect =
+                        strtolower(trim($item['answer'])) ==
+                        strtolower(trim($question->correct_answer[0] ?? ''));
                 }
 
                 if ($isCorrect) {
@@ -151,17 +187,29 @@ class QuizController extends Controller
                 QuizAnswer::create([
                     'attempt_id' => $attempt->id,
                     'question_id' => $question->id,
-                    'answer' => (array)$item['answer'],
+                    'answer' => (array) $item['answer'],
                     'is_correct' => $isCorrect,
                     'points_awarded' => $points,
                 ]);
+
+                $answersData[] = [
+                    'question_id' => $question->id,
+                    'question' => $question->content,
+                    'your_answer' => $item['answer'],
+                    'correct_answer' => $question->correct_answer,
+                    'is_correct' => $isCorrect,
+                    'points_awarded' => $points,
+                ];
             }
 
             $attempt->update([
                 'score' => $score,
                 'status' => 'completed',
                 'finished_at' => now(),
-                'meta' => ['correct' => $correct, 'total' => count($quiz->questions)],
+                'meta' => [
+                    'correct' => $correct,
+                    'total' => count($quiz->questions)
+                ],
             ]);
         });
 
@@ -169,22 +217,53 @@ class QuizController extends Controller
             'status' => 1,
             'message' => 'Quiz submitted successfully',
             'data' => [
+                'attempt_id' => $attempt->id,
+                'quiz_id' => $quiz->id,
+                'quiz_title' => $quiz->title,
                 'score' => $score,
                 'correct' => $correct,
                 'total' => count($quiz->questions),
+                'answers' => $answersData,
             ]
         ]);
     }
+
 
     // GET /quizzes/attempts
     public function attempts()
     {
         $user = Auth::user();
-        $attempts = QuizAttempt::with('quiz:id,title')
-            ->where('kid_id', $user->kid->id)
-            ->latest()
-            ->get();
 
-        return response()->json(['status' => 1, 'data' => $attempts]);
+        $kid = $user->kid;
+
+        if (!$kid) {
+            return response()->json([
+                'message' => 'Kid profile not found'
+            ], 404);
+        }
+
+        $attempts = QuizAttempt::with('quiz:id,title')
+            ->where('kid_id', $kid->id)
+            ->latest()
+            ->get()
+            ->map(function ($attempt) {
+
+                return [
+                    'attempt_id' => $attempt->id,
+                    'quiz_id' => $attempt->quiz_id,
+                    'quiz_title' => $attempt->quiz?->title,
+                    'score' => $attempt->score,
+                    'status' => $attempt->status,
+                    'started_at' => $attempt->started_at,
+                    'finished_at' => $attempt->finished_at,
+                    'correct_answers' => $attempt->meta['correct'] ?? 0,
+                    'total_questions' => $attempt->meta['total'] ?? 0,
+                ];
+            });
+
+        return response()->json([
+            'status' => 1,
+            'data' => $attempts
+        ]);
     }
 }
