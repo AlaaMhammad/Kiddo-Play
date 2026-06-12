@@ -164,13 +164,15 @@ class QuizController extends Controller
                 }
 
                 //  توحيد النوع (حل المشكلة الأساسية)
-                $userAnswer = trim((string) $item['answer']);
+                $userAnswer = (string) $item['answer'];
 
                 $correctAnswers = collect($question->correct_answer)
-                    ->map(fn($v) => trim((string) $v))
+                    ->map(fn($v) => (string) $v)
                     ->toArray();
 
-                $isCorrect = in_array($userAnswer, $correctAnswers, true);
+                $isCorrect = collect($question->correct_answer)
+                    ->map(fn($v) => trim((string) $v))
+                    ->contains(trim((string) $item['answer']));
 
                 $points = 0;
 
