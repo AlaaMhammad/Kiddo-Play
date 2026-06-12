@@ -136,7 +136,6 @@ class QuizController extends Controller
             ], 404);
         }
 
-        /** @var Quiz $quiz */
         $quiz = Quiz::with('questions')->findOrFail($id);
 
         $attempt = QuizAttempt::where('quiz_id', $quiz->id)
@@ -153,43 +152,27 @@ class QuizController extends Controller
 
         $score = 0;
         $correct = 0;
-        $totalQuestions = $quiz->questions->count();
 
-        DB::transaction(function () use (
-            $validated,
-            $attempt,
-            $quiz,
-            &$score,
-            &$correct,
-            $totalQuestions
-        ) {
+        DB::transaction(function () use ($validated, $attempt, $quiz, &$score, &$correct) {
+
             foreach ($validated['answers'] as $item) {
 
-                $question = $quiz->questions
-                    ->where('id', $item['question_id'])
-                    ->first();
+                $question = $quiz->questions->firstWhere('id', $item['question_id']);
 
                 if (!$question) {
                     continue;
                 }
 
-                $isCorrect = false;
-                $points = 0;
+                //  توحيد النوع (حل المشكلة الأساسية)
+                $userAnswer = (string) $item['answer'];
 
-                if (
-                    $question->type === 'mcq' ||
-                    $question->type === 'true_false'
-                ) {
-                    $isCorrect = in_array(
-                        $item['answer'],
-                        (array) $question->correct_answer
-                    );
-                } else {
-                    $isCorrect =
-                        strtolower(trim($item['answer']))
-                        ==
-                        strtolower(trim($question->correct_answer[0] ?? ''));
-                }
+                $correctAnswers = collect($question->correct_answer)
+                    ->map(fn($v) => (string) $v)
+                    ->toArray();
+
+                $isCorrect = in_array($userAnswer, $correctAnswers);
+
+                $points = 0;
 
                 if ($isCorrect) {
                     $points = $question->points;
@@ -200,7 +183,7 @@ class QuizController extends Controller
                 QuizAnswer::create([
                     'attempt_id' => $attempt->id,
                     'question_id' => $question->id,
-                    'answer' => (array) $item['answer'],
+                    'answer' => $userAnswer,
                     'is_correct' => $isCorrect,
                     'points_awarded' => $points,
                 ]);
@@ -212,7 +195,7 @@ class QuizController extends Controller
                 'finished_at' => now(),
                 'meta' => [
                     'correct' => $correct,
-                    'total' => $totalQuestions,
+                    'total' => $quiz->questions->count(),
                 ],
             ]);
         });
@@ -228,13 +211,12 @@ class QuizController extends Controller
                 'result' => [
                     'score' => $score,
                     'correct_answers' => $correct,
-                    'total_questions' => $totalQuestions,
-                    'wrong_answers' => $totalQuestions - $correct,
+                    'wrong_answers' => $quiz->questions->count() - $correct,
+                    'total_questions' => $quiz->questions->count(),
                 ],
-            ],
+            ]
         ]);
     }
-
 
     // GET /quizzes/attempts
     public function attempts()
