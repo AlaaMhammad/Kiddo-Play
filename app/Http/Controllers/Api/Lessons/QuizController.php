@@ -68,14 +68,25 @@ class QuizController extends Controller
     public function startAttempt($id)
     {
         $user = Auth::user();
+
         if ($user->role->name !== 'kid') {
-            return response()->json(['message' => 'Only kids can start a quiz'], 403);
+            return response()->json([
+                'message' => 'Only kids can start a quiz'
+            ], 403);
+        }
+
+        $kid = $user->kid;
+
+        if (!$kid) {
+            return response()->json([
+                'message' => 'Kid profile not found'
+            ], 404);
         }
 
         $quiz = Quiz::findOrFail($id);
 
         $attempt = QuizAttempt::create([
-            'kid_id' => $user->id,
+            'kid_id' => $kid->id,
             'quiz_id' => $quiz->id,
             'started_at' => now(),
             'status' => 'started',
@@ -84,7 +95,9 @@ class QuizController extends Controller
         return response()->json([
             'status' => 1,
             'message' => 'Quiz attempt started',
-            'data' => ['attempt_id' => $attempt->id]
+            'data' => [
+                'attempt_id' => $attempt->id
+            ]
         ]);
     }
 
@@ -168,7 +181,7 @@ class QuizController extends Controller
     {
         $user = Auth::user();
         $attempts = QuizAttempt::with('quiz:id,title')
-            ->where('kid_id', $user->id)
+            ->where('kid_id', $user->kid->id)
             ->latest()
             ->get();
 
