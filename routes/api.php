@@ -88,10 +88,10 @@ Route::prefix('v1')->group(function () {
         });
 
         Route::prefix('quizzes')->group(function () {
+            Route::get('/attempts', [QuizController::class, 'attempts']);
             Route::get('/{id}', [QuizController::class, 'show']);
             Route::post('/{id}/start', [QuizController::class, 'startAttempt']);
             Route::post('/{id}/submit', [QuizController::class, 'submitAttempt']);
-            Route::get('/attempts', [QuizController::class, 'attempts']);
         });
 
         //  Achievements
