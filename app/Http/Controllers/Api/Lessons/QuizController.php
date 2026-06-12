@@ -58,7 +58,9 @@ class QuizController extends Controller
                             : $q->correct_answer,
 
                         // خيارات الإجابة
-                        'options' => $q->options,
+                        'options' => is_string($q->options)
+                            ? json_decode($q->options, true)
+                            : $q->options,
 
                         'points' => $q->points,
                     ];
