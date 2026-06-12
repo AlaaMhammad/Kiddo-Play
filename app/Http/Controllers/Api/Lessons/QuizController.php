@@ -3,26 +3,31 @@
 namespace App\Http\Controllers\Api\Lessons;
 
 use App\Http\Controllers\Controller;
-use App\Models\{Quiz, Question, QuizAttempt, QuizAnswer};
+use App\Models\{Quiz, QuizAttempt, QuizAnswer};
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
-
-
 class QuizController extends Controller
 {
-    // GET /lessons/{lesson_id}/quizzes
+    // =========================
+    // GET quizzes by lesson
+    // =========================
     public function byLesson($lesson_id)
     {
         $quizzes = Quiz::where('lesson_id', $lesson_id)
             ->where('is_active', true)
             ->get(['id', 'title', 'time_limit_seconds']);
 
-        return response()->json(['status' => 1, 'data' => $quizzes]);
+        return response()->json([
+            'status' => 1,
+            'data' => $quizzes
+        ]);
     }
 
-    // GET /quizzes/{id}
+    // =========================
+    // GET quiz with questions
+    // =========================
     public function show($id)
     {
         $quiz = Quiz::with(['questions' => function ($q) {
@@ -40,27 +45,18 @@ class QuizController extends Controller
 
                 'questions' => $quiz->questions->values()->map(function ($q, $index) {
 
-                    // تفكيك العملية الحسابية
-                    preg_match('/(\d+)\s*([\+\-\*\/])\s*(\d+)/', $q->content, $matches);
+                    preg_match('/(\d+)\s*([\+\-\*\/])\s*(\d+)/', $q->content, $m);
 
                     return [
                         'id' => $q->id,
                         'number' => $index + 1,
 
-                        'first' => $matches[1] ?? null,
-                        'operator' => $matches[2] ?? null,
-                        'second' => $matches[3] ?? null,
+                        'first' => $m[1] ?? null,
+                        'operator' => $m[2] ?? null,
+                        'second' => $m[3] ?? null,
 
-                        // الإجابة الصحيحة
-                        // 'correct_answer' => $q->correct_answer ?? null,
-                        'correct_answer' => is_string($q->correct_answer)
-                            ? json_decode($q->correct_answer, true)
-                            : $q->correct_answer,
-
-                        // خيارات الإجابة
-                        'options' => is_string($q->options)
-                            ? json_decode($q->options, true)
-                            : $q->options,
+                        'correct_answer' => $q->correct_answer,
+                        'options' => $q->options,
 
                         'points' => $q->points,
                     ];
@@ -69,23 +65,21 @@ class QuizController extends Controller
         ]);
     }
 
-    // POST /quizzes/{id}/start
+    // =========================
+    // START ATTEMPT
+    // =========================
     public function startAttempt($id)
     {
         $user = Auth::user();
 
         if ($user->role->name !== 'kid') {
-            return response()->json([
-                'message' => 'Only kids can start a quiz'
-            ], 403);
+            return response()->json(['message' => 'Only kids can start quiz'], 403);
         }
 
         $kid = $user->kid;
 
         if (!$kid) {
-            return response()->json([
-                'message' => 'Kid profile not found'
-            ], 404);
+            return response()->json(['message' => 'Kid profile not found'], 404);
         }
 
         $quiz = Quiz::findOrFail($id);
@@ -110,30 +104,27 @@ class QuizController extends Controller
                     'id' => $kid->id,
                     'name' => $kid->display_name,
                 ],
-                'attempt_status' => $attempt->status,
                 'started_at' => $attempt->started_at,
+                'status' => $attempt->status,
             ]
         ]);
     }
 
-
-    // POST /quizzes/{id}/submit
+    // =========================
+    // SUBMIT ATTEMPT
+    // =========================
     public function submitAttempt(Request $request, $id)
     {
         $user = Auth::user();
 
         if ($user->role->name !== 'kid') {
-            return response()->json([
-                'message' => 'Only kids can submit answers'
-            ], 403);
+            return response()->json(['message' => 'Only kids can submit answers'], 403);
         }
 
         $kid = $user->kid;
 
         if (!$kid) {
-            return response()->json([
-                'message' => 'Kid profile not found'
-            ], 404);
+            return response()->json(['message' => 'Kid profile not found'], 404);
         }
 
         $quiz = Quiz::with('questions')->findOrFail($id);
@@ -152,6 +143,7 @@ class QuizController extends Controller
 
         $score = 0;
         $correct = 0;
+        $total = $quiz->questions->count();
 
         DB::transaction(function () use ($validated, $attempt, $quiz, &$score, &$correct) {
 
@@ -159,20 +151,16 @@ class QuizController extends Controller
 
                 $question = $quiz->questions->firstWhere('id', $item['question_id']);
 
-                if (!$question) {
-                    continue;
-                }
+                if (!$question) continue;
 
-                //  توحيد النوع (حل المشكلة الأساسية)
-                $userAnswer = (string) $item['answer'];
+                $userAnswer = trim((string) $item['answer']);
 
-                $correctAnswers = collect($question->correct_answer)
-                    ->map(fn($v) => (string) $v)
-                    ->toArray();
+                $correctAnswers = array_map(
+                    fn($v) => trim((string) $v),
+                    (array) $question->correct_answer
+                );
 
-                $isCorrect = collect($question->correct_answer)
-                    ->map(fn($v) => trim((string) $v))
-                    ->contains(trim((string) $item['answer']));
+                $isCorrect = in_array($userAnswer, $correctAnswers);
 
                 $points = 0;
 
@@ -213,14 +201,16 @@ class QuizController extends Controller
                 'result' => [
                     'score' => $score,
                     'correct_answers' => $correct,
-                    'wrong_answers' => $quiz->questions->count() - $correct,
-                    'total_questions' => $quiz->questions->count(),
+                    'wrong_answers' => $total - $correct,
+                    'total_questions' => $total,
                 ],
             ]
         ]);
     }
 
-    // GET /quizzes/attempts
+    // =========================
+    // ATTEMPTS HISTORY
+    // =========================
     public function attempts()
     {
         $user = Auth::user();
@@ -228,9 +218,7 @@ class QuizController extends Controller
         $kid = $user->kid;
 
         if (!$kid) {
-            return response()->json([
-                'message' => 'Kid profile not found'
-            ], 404);
+            return response()->json(['message' => 'Kid profile not found'], 404);
         }
 
         $attempts = QuizAttempt::with('quiz:id,title')
@@ -248,28 +236,20 @@ class QuizController extends Controller
                     ],
 
                     'score' => $attempt->score,
-
                     'status' => $attempt->status,
 
-                    'correct_answers' =>
-                    $attempt->meta['correct'] ?? 0,
-
-                    'total_questions' =>
-                    $attempt->meta['total'] ?? 0,
-
-                    'wrong_answers' => ($attempt->meta['total'] ?? 0)
-                        -
-                        ($attempt->meta['correct'] ?? 0),
+                    'correct_answers' => $attempt->meta['correct'] ?? 0,
+                    'total_questions' => $attempt->meta['total'] ?? 0,
+                    'wrong_answers' => ($attempt->meta['total'] ?? 0) - ($attempt->meta['correct'] ?? 0),
 
                     'started_at' => $attempt->started_at,
-
                     'finished_at' => $attempt->finished_at,
                 ];
             });
 
         return response()->json([
             'status' => 1,
-            'data' => $attempts,
+            'data' => $attempts
         ]);
     }
 }
