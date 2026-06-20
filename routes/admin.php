@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\Users\UserController;
 use App\Http\Controllers\Admin\Users\RoleController;
-use App\Http\Controllers\Admin\Users\AvatarController;
+use App\Http\Controllers\Admin\AvatarController;
 use App\Http\Controllers\Admin\Kids\{
     KidController,
     ParentChildController,
